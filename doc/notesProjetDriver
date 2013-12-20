@@ -1,0 +1,10 @@
+1) Recompiler gcc pour architecture arm.
+faire un script qui automatise ça.
+
+2) utiliser ce toolchain pour compiler le noyau
+
+
+!! timing capteurs (c'est du série)
+!! phase de decouverte des multiples capteurs
+
+
