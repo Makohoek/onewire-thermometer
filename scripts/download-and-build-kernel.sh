@@ -11,6 +11,7 @@ if [ $# -ne 2 ]; then
   exit 0;
 fi
 
+CURRENTDIR=$( pwd )
 BUILDDIR=$1
 PATHTOARMCOMPILER=$2
 
@@ -38,6 +39,9 @@ echo "you have the following sitting in your kernel tree:
     arch/arm/boot/uImage
     utput/lib/modules/3.4.XXX/"
 
+
+cd $CURRENTDIR
+cd $BUILDDIR
 
 # u-boot
 git clone https://github.com/linux-sunxi/u-boot-sunxi.git
