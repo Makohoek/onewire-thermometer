@@ -276,3 +276,18 @@ if [ ! -e .${GDB}.build ]; then
   touch .${GDB}.build
   rm -rf build/* ${GDB}
 fi
+
+# print success to user!
+echo   "******************************************************************"
+echo   "* The install is complete!                                   "
+echo   "*                                                            "
+echo   "* Please consider adding the following lines to your         "
+echo   "* bashrc file:                                               "
+echo   "* PATH=\${PATH}:$PREFIX/bin                                      "
+echo   "*                                                            "
+echo   "* You can find your.bashrc at $HOME/.bashrc                  "
+echo   "*                                                            "
+echo   "* After that, type source ~/.bashrc "
+echo   "* And you should be able to use your new gcc cross compiler!"
+echo   "******************************************************************"
+
