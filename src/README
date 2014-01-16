@@ -1,0 +1,3 @@
+usage:
+insmod therm.ko GpioPort=<GpioPort> (0 by default)
+
