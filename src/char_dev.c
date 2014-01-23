@@ -1,7 +1,7 @@
 /*
- * Mattijs KORPERSHOEK
+ * Mattijs Korpershoek
  * <mattijs.korpershoek@gmail.com>
- * Alexandre MONTILLA
+ * Alexandre Montilla
  * <alexandre.montilla@gmail.com>
  */
 /* Includes */
