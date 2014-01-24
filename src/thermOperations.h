@@ -8,6 +8,8 @@
  */
 #ifndef __INC_THERMOPERATIONS__
 #define __INC_THERMOPERATIONS__
+#include "bitOperations.h"
+#include "protocolOperations.h" 
 
 typedef enum 
 {
@@ -31,6 +33,5 @@ typedef enum
 
 int readTemperature( void ); //TODO
 static void performTransaction( void ); //TODO
-static void performInitialization( void ); //TOTEST
 
 #endif /* end of include guard: __INC_THERMOPERATIONS__ */
