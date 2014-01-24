@@ -8,14 +8,27 @@
  */
 #include "protocolOperations.h" 
 
+#define INITIALIZATION_LOW_DELAY 480
+#define INITIALIZATION_HIGH_DELAY 60
+#define WRITE_ONE_LOW_DELAY 15
+#define WRITE_ONE_HIGH_DELAY 45
+#define WRITE_ZERO_PULL_DOWN_DELAY 60
+#define READ_PULL_DOWN_DELAY 6
+#define READ_HIGH_DELAY 9
+#define READ_BIT_DELAY 55 // can be changed to 45 as described the documentation
+
+static void writeOneToBus();
+static void writeZeroToBus();
+
+
 void sendInitializationSequence( void )
 {
   /* generate a reset pulse */
   writeBitGpio(ZERO);
-  udelay(480);
+  udelay(INITIALIZATION_LOW_DELAY);
 
   writeBitGpio(ONE);
-  udelay(70);
+  udelay(INITIALIZATION_HIGH_DELAY);
 
   /* read a presence pulse */
   result = readBitGpio();
@@ -58,20 +71,36 @@ void writeBitToBus( Bit bitToWrite )
 {
   if (bitToWrite == ONE) 
   {
-    writeBitGpio(ZERO);
-    udelay(15);
-    writeBitGpio(ONE);
-    udelay(45);
-  }  
+    writeOneToBus();
+  }
   else 
   {
-    writeBitGpio(ZERO);
-    udelay(60);
-    writeBitGpio(ONE);
+    writeZeroToBus();
   }
-  udelay(1);
-  writeDefaultBitGpio();
 }
+
+static void writeOneToBus()
+{
+  writeBitGpio(ZERO);
+  udelay(WRITE_ONE_LOW_DELAY);
+  writeBitGpio(ONE);
+  udelay(WRITE_ONE_HIGH_DELAY);
+
+  /* recovery time */
+  writeDefaultBitGpio();
+  udelay(1);
+}
+
+static void writeZeroToBus()
+{
+  writeBitGpio(ZERO);
+  udelay(WRITE_ZERO_PULL_DOWN_DELAY);
+ 
+  /* recovery time */
+  writeDefaultBitGpio();
+  udelay(1);
+}
+
 
 /**
  * Note: MUST be called after 
@@ -81,13 +110,14 @@ Bit readBitFromBus( void )
 {
   Bit result;
   writeBitGpio(ZERO);
-  udelay(6);
+  udelay(READ_PULL_DOWN_DELAY);
   writeBitGpio(ONE);
-  udelay(9);
+  udelay(READ_HIGH_DELAY);
+  
   // data from the DS18B20 is valid 15us after falling edge
   result = readBitGpio();
 
-  udelay(55);
+  udelay(READ_BIT_DELAY);
   writeDefaultBitGpio();
 
   return result;
@@ -95,13 +125,12 @@ Bit readBitFromBus( void )
 
 void writeFunctionCommand(FunctionCommand functionCommand)
 {
-    writeByteToBus(functionCommand);
+  writeByteToBus(functionCommand);
 }
 
 void writeROMCommand(ROMCommand romCommand)
 {
-    writeByteToBus(romCommand);
+  writeByteToBus(romCommand);
 }
-
 
 
