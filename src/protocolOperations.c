@@ -31,6 +31,29 @@ void sendInitializationSequence( void )
   writeDefaultBitGpio();
 }
 
+void writeByteToBus(u8 byteToWrite)
+{
+  int i;
+  for ( i = 0; i < 7; i++ )
+  {
+    Bit bitToWrite = intToBit((byteToWrite >> i) & 0x1);
+    writeBitToBus(bitToWrite);
+  }
+  printk(KERN_INFO "Debug: send a byte (0x%2x) to the bus\n",  byteToWrite);
+}
+
+u8 readByteFromBus( void )
+{
+  u8 result;
+  int i;
+  for ( i = 0; i < 7; i++ )
+  {
+    Bit readedBit = readBitFromBus();
+    result |= BitToInt(readBit) << i;
+  }
+  printk(KERN_INFO "Debug: received a byte (0x%2x) to the bus\n",  byteToWrite);
+}
+
 void writeBitToBus( Bit bitToWrite )
 {
   if (bitToWrite == ONE) 

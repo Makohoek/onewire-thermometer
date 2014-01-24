@@ -14,31 +14,6 @@ int initializeBitOperations( int GpioPin )
   mGpioPin = GpioPin; 
 }
 
-// FIXME these functions should be moved to another module and renamed
-//void writeByteGpio(u8 byteToWrite)
-//{
-//  int i;
-//  for ( i = 0; i < 7; i++ )
-//  {
-//    Bit bitToWrite = intToBit((byte >> i) & 0x1);
-//    writeBitGpio(bitToWrite);
-//  }
-//}
-//
-//// FIXME these functions should be moved to another module and renamed
-////TODO: maybe omit the BitToInt call?
-//// test it when compiling
-//u8 readByteGpio( )
-//{
-//  u8 result;
-//  int i;
-//  for ( i = 0; i < 7; i++ )
-//  {
-//    Bit readedBit = readBitGpio();
-//    result |= BitToInt(readBitGpio) << i;
-//  }
-//}
-
 void writeBitGpio( Bit bitToWrite )
 {
   assertPinIsInitialized();

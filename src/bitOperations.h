@@ -26,11 +26,6 @@ Bit readBitGpio( );
 
 void writeDefaultBitGpio( void );
 
-// FIXME these functions should be moved to another module and renamed
-//void writeByteGpio(u8 byteToWrite);
-//u8 readByteGpio(u8 byteToWrite);
-
-
 inline int BitToInt(Bit myBit);
 inline Bit intToBit(int myInt);
 
