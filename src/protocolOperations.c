@@ -64,6 +64,9 @@ Bit readBitFromBus( void )
   // data from the DS18B20 is valid 15us after falling edge
   result = readBitGpio();
 
+  udelay(55);
   writeDefaultBitGpio();
+
+  return result;
 }
 

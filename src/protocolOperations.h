@@ -17,5 +17,7 @@ void sendInitializationSequence( void );
 void writeBitToBus( Bit bitToWrite );
 Bit readBitFromBus( void );
 
+void writeByteToBus(u8 byteToWrite);
+u8 readByteFromBus(u8 byteToWrite);
 
 #endif /* end of include guard: __INC_PROTOCOLOPERATIONS__ */

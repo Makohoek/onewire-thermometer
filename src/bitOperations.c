@@ -39,7 +39,7 @@ int initializeBitOperations( int GpioPin )
 //  }
 //}
 
-int writeBitGpio( Bit bitToWrite )
+void writeBitGpio( Bit bitToWrite )
 {
   assertPinIsInitialized();
   int bit = BitToInt(bitToWrite);
@@ -54,6 +54,12 @@ Bit readBitGpio()
   int bit = gpio_get_value( mGpioPin );
   return (intToBit(bit));
 }
+
+void writeDefaultBitGpio( void )
+{
+  writeBitGpio(ONE);
+}
+
 
 inline int BitToInt(Bit myBit)
 {
@@ -72,3 +78,5 @@ static void assertPinIsInitialized( )
     printk(KERN_ERROR "mGpioPin is not initialized: cannot operate on -1\n");
   }
 }
+
+
