@@ -11,6 +11,7 @@
 
 #include "bitOperations.h"
 #include "protocolOperations.h" 
+#include "thermOperations.h"
 
 void sendInitializationSequence( void );
 
@@ -19,5 +20,8 @@ Bit readBitFromBus( void );
 
 void writeByteToBus(u8 byteToWrite);
 u8 readByteFromBus(u8 byteToWrite);
+
+void writeFunctionCommand(FunctionCommand command);
+void writeROMCommand(ROMCommand romcommand);
 
 #endif /* end of include guard: __INC_PROTOCOLOPERATIONS__ */
