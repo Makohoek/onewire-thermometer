@@ -122,6 +122,10 @@ static int init(void)
     return -EINVAL;
   }
 
+  initializeBitOperations(GpioPort);
+  sendInitializationSequence();
+  writeROMCommand(READ_ROM);
+
   return(errorCode);
 }
 
