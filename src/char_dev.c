@@ -14,6 +14,9 @@
 #include <linux/fs.h>
 #include <asm/uaccess.h>
 #include <linux/sched.h>
+#include "thermOperations.h"
+#include "bitOperations.h"
+#include "protocolOperations.h"
 
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 1;

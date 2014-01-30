@@ -6,27 +6,30 @@
 static int mGpioPin = -1;
 
 /* methods */
-static void assertPinIsInitialized( );
+static void assertPinIsInitialized( void );
 
 int initializeBitOperations( int GpioPin )
 {
   // initialize the port we want to work on
-  mGpioPin = GpioPin; 
+  mGpioPin = GpioPin;
+  return 0;
 }
 
 void writeBitGpio( Bit bitToWrite )
 {
+  int bit;
   assertPinIsInitialized();
-  int bit = BitToInt(bitToWrite);
-  gpio_direction_output(mGpioPin);
-  gpio_set_value(mGpioPin,  bit);
+  bit = BitToInt(bitToWrite);
+  gpio_direction_output(mGpioPin, bit);
+  gpio_set_value(mGpioPin, bit);
 }
 
-Bit readBitGpio()
+Bit readBitGpio( void )
 {
+  int bit;
   assertPinIsInitialized();
   gpio_direction_input( mGpioPin );
-  int bit = gpio_get_value( mGpioPin );
+  bit = gpio_get_value( mGpioPin );
   return (intToBit(bit));
 }
 
@@ -50,7 +53,7 @@ static void assertPinIsInitialized( )
 {
   if (mGpioPin == -1) 
   {
-    printk(KERN_ERROR "mGpioPin is not initialized: cannot operate on -1\n");
+    printk(KERN_ERR "mGpioPin is not initialized: cannot operate on -1\n");
   }
 }
 

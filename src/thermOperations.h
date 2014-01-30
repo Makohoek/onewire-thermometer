@@ -9,14 +9,13 @@
 #ifndef __INC_THERMOPERATIONS__
 #define __INC_THERMOPERATIONS__
 #include "bitOperations.h"
-#include "protocolOperations.h" 
 
 typedef enum 
 {
   SKIP_ROM = 0xCC, 
   READ_ROM = 0x33, 
   MATCH_ROM  = 0x55, 
-} ROMCommands;
+} ROMCommand;
 
 // check real hex values here
 typedef enum 
@@ -28,7 +27,7 @@ typedef enum
   READ_PSUPPLY = 0xB4, 
   RESUME_CMD = 0xA5
   /* missing commands can be found in kernel/drivers/w1/w1.h */
-} FunctionCommands;
+} FunctionCommand;
 
 
 int readTemperature( void ); //TODO

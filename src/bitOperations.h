@@ -22,7 +22,7 @@ typedef enum
 
 int initializeBitOperations( int GpioPin );
 void writeBitGpio( Bit bitToWrite );
-Bit readBitGpio( );
+Bit readBitGpio( void );
 
 void writeDefaultBitGpio( void );
 

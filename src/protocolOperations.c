@@ -6,7 +6,7 @@
  * Mattijs Korpershoek
  * <mattijs.korpershoek@gmail.com>
  */
-#include "protocolOperations.h" 
+#include "protocolOperations.h"
 
 #define INITIALIZATION_LOW_DELAY 480
 #define INITIALIZATION_HIGH_DELAY 60
@@ -17,12 +17,14 @@
 #define READ_HIGH_DELAY 9
 #define READ_BIT_DELAY 55 // can be changed to 45 as described the documentation
 
-static void writeOneToBus();
-static void writeZeroToBus();
+static void writeOneToBus( void );
+static void writeZeroToBus( void );
 
 
 void sendInitializationSequence( void )
 {
+  Bit result; 
+  
   /* generate a reset pulse */
   writeBitGpio(ZERO);
   udelay(INITIALIZATION_LOW_DELAY);
@@ -57,15 +59,17 @@ void writeByteToBus(u8 byteToWrite)
 
 u8 readByteFromBus( void )
 {
-  u8 result;
   int i;
+  u8 result = 0;
   for ( i = 0; i < 7; i++ )
   {
     Bit readedBit = readBitFromBus();
-    result |= BitToInt(readBit) << i;
+    result |= BitToInt(readedBit) << i;
   }
-  printk(KERN_INFO "Debug: received a byte (0x%2x) to the bus\n",  byteToWrite);
+  printk(KERN_INFO "Debug: received a byte (0x%2x) from the bus\n",  result);
+  return (result);
 }
+
 
 void writeBitToBus( Bit bitToWrite )
 {
@@ -79,7 +83,7 @@ void writeBitToBus( Bit bitToWrite )
   }
 }
 
-static void writeOneToBus()
+static void writeOneToBus( void )
 {
   writeBitGpio(ZERO);
   udelay(WRITE_ONE_LOW_DELAY);
@@ -91,7 +95,7 @@ static void writeOneToBus()
   udelay(1);
 }
 
-static void writeZeroToBus()
+static void writeZeroToBus( void )
 {
   writeBitGpio(ZERO);
   udelay(WRITE_ZERO_PULL_DOWN_DELAY);

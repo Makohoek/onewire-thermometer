@@ -1,6 +1,6 @@
 ifneq ($(KERNELRELEASE),)
-   	obj-m := therm.o
-   therm-objs := char_dev.o
+   	obj-m := char_dev.o
+	   therm-objs := bitOperations.o protocolOperations.o thermOperations.o
 else
 	KERNEL_DIR ?= /lib/modules/$(shell uname -r)/build
 	PWD := $(shell pwd)

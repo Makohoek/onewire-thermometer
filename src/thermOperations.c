@@ -11,12 +11,14 @@
 int readTemperature( void )
 {
   /* code */
+  return -1;
 }
 
 static void performTransaction( void )
 {
-  sendInitializationSequence();
-  performRomCommand();
-  performFunctionCommand();
+  //TODO
+  //sendInitializationSequence();
+  //performRomCommand();
+  //performFunctionCommand();
 }
 

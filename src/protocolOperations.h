@@ -1,8 +1,8 @@
 /*
  * Handles the different timings
- * in order to communicate properly with the
+ * order to communicate properly with the
  * Maxim DS18B2
- * 
+ *
  * Mattijs Korpershoek
  * <mattijs.korpershoek@gmail.com>
  */
@@ -10,8 +10,9 @@
 #define __INC_PROTOCOLOPERATIONS__
 
 #include "bitOperations.h"
-#include "protocolOperations.h" 
 #include "thermOperations.h"
+#include <linux/types.h> // include added for autocompletion
+#include <linux/delay.h>
 
 void sendInitializationSequence( void );
 
