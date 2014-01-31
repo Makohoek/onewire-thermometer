@@ -31,6 +31,5 @@ typedef enum
 
 
 int readTemperature( void ); //TODO
-static void performTransaction( void ); //TODO
 
 #endif /* end of include guard: __INC_THERMOPERATIONS__ */
