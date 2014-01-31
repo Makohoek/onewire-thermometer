@@ -24,7 +24,7 @@ static const unsigned char NB_OF_MINORS = 1;
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 /* Module parameters */
-static unsigned int GpioPort = 0;
+static int GpioPort = -1;
 
 /* Standard character device operations */
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset);
@@ -124,7 +124,6 @@ static int init(void)
 
   initializeBitOperations(GpioPort);
   sendInitializationSequence();
-  writeROMCommand(READ_ROM);
 
   return(errorCode);
 }
@@ -133,7 +132,6 @@ static int init(void)
 static void cleanup(void)
 {
   int errorCode = 0;
-
   /* freeing memory and major,(s) */
   unregister_chrdev_region(dev,NB_OF_MINORS);
   cdev_del(myDevice);
@@ -142,9 +140,8 @@ static void cleanup(void)
 module_exit(cleanup);
 module_init(init);
 
-module_param(GpioPort, uint, S_IRUGO | S_IWUSR);
+module_param(GpioPort, int, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(GpioPort, "Used GPIO port for the thermometer");
-
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Mattijs Korpershoek / Alexandre Montilla");
 MODULE_DESCRIPTION("1-Wire Digital thermometer DS18B2 driver");

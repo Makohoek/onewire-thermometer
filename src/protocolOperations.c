@@ -24,7 +24,7 @@ static void writeZeroToBus( void );
 void sendInitializationSequence( void )
 {
   Bit result; 
-  
+
   /* generate a reset pulse */
   writeBitGpio(ZERO);
   udelay(INITIALIZATION_LOW_DELAY);
@@ -73,7 +73,7 @@ u8 readByteFromBus( void )
 
 void writeBitToBus( Bit bitToWrite )
 {
-  if (bitToWrite == ONE) 
+  if ( bitToWrite == ONE ) 
   {
     writeOneToBus();
   }
@@ -99,7 +99,7 @@ static void writeZeroToBus( void )
 {
   writeBitGpio(ZERO);
   udelay(WRITE_ZERO_PULL_DOWN_DELAY);
- 
+
   /* recovery time */
   writeDefaultBitGpio();
   udelay(1);
@@ -117,7 +117,7 @@ Bit readBitFromBus( void )
   udelay(READ_PULL_DOWN_DELAY);
   writeBitGpio(ONE);
   udelay(READ_HIGH_DELAY);
-  
+
   // data from the DS18B20 is valid 15us after falling edge
   result = readBitGpio();
 
