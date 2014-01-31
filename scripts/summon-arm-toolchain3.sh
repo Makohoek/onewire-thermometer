@@ -33,7 +33,7 @@ GDB=gdb-7.6                 # 6.8
 PARALLEL="-j 5"                 # PARALLEL = "-j 5" for 4 CPU's
 
 # Command-line parameters
-TARGET='arm-linux-eabi'    # TARGET = arm-elf | arm-none-eabi | arm-linux-eabi
+TARGET='arm-eabi'    # TARGET = arm-elf | arm-none-eabi | arm-linux-eabi
 PREFIX=$1/${TARGET}         # Install location of your toolchain (e.g. ${HOME})
 INSTALL=${PREFIX}/install
 
@@ -141,7 +141,7 @@ if [ ! -e .${GCC}-bootstrap.build ]; then
   ../${GCC}/configure --target=${TARGET} \
     --prefix=${PREFIX} \
     --with-newlib \
-    --enable-languages="c,c++" \
+    --enable-languages="c" \
     --without-headers \
     --with-gnu-as \
     --with-gnu-ld \
@@ -227,7 +227,7 @@ if [ ! -e .${GCC}.build ]; then
   echo "******************************************************************"
   ../${GCC}/configure --target=${TARGET} \
     --prefix=${PREFIX} \
-    --enable-languages="c,c++" \
+    --enable-languages="c" \
     --enable-newlib \
     --with-gnu-as \
     --with-gnu-ld \
