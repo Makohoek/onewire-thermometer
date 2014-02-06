@@ -1,4 +1,4 @@
-KERNEL_DIR=/media/a852afe7-e4bb-48b6-a1da-7583947c84d4/sunxi-jorda/linux-sunxi
+KERNEL_DIR=/media/storage/linux-sunxi-sunxi-v3.4.67-r0/
 ifneq ($(KERNELRELEASE),)
 	obj-m := therm.o
 	therm-objs := char_dev.o bitOperations.o protocolOperations.o thermOperations.o
@@ -7,14 +7,18 @@ else
 	PWD := $(shell pwd)
 default:
 	$(MAKE) ARCH=arm CROSS_COMPILE=arm-eabi- -C ${KERNEL_DIR} M=$(PWD) modules
-alex:
+alexmac:
 	$(MAKE) ARCH=arm CROSS_COMPILE=arm-eabi- -C ${KERNEL_DIR} M=$(PWD) modules
 	scp -P 2220 -r *.o *.mod.* *.ko modules.order Module.symvers .*.cmd .tmp_versions camsi6@camsi.ups-tlse.fr:~/AlexMattijs
 	ssh -p 2220 camsi6@camsi.ups-tlse.fr
+alexfac:
+	$(MAKE) ARCH=arm CROSS_COMPILE=arm-eabi- -C ${KERNEL_DIR} M=$(PWD) modules
+	scp -r *.o *.mod.* *.ko modules.order Module.symvers .*.cmd .tmp_versions root@olinuxino:~/AlexMattijs
+	ssh root@olinuxino
 matt:
 	$(MAKE) ARCH=arm CROSS_COMPILE=arm-eabi- -C ${KERNEL_DIR} M=$(PWD) modules
-	scp -P 2220 -r *.o *.mod.* *.ko modules.order Module.symvers .*.cmd .tmp_versions camsi5@camsi.ups-tlse.fr:~/AlexMattijs
-	ssh -p 2220 camsi5@camsi.ups-tlse.fr
+	scp -r *.o *.mod.* *.ko modules.order Module.symvers .*.cmd .tmp_versions root@olinuxino:~/AlexMattijs
+	ssh root@olinuxino
 clean:
 	rm -rf *.o *.ko.* *.mod.* *.ko .[a-z] modules.order Module.symvers .*.cmd
 endif

@@ -1,6 +1,5 @@
 #include "bitOperations.h"
 #include <linux/gpio.h>
-#include "/media/a852afe7-e4bb-48b6-a1da-7583947c84d4/linux-sunxi/include/linux/gpio.h" // include added for autocompletion
 
 /* members */
 static int mGpioPin = -1;
@@ -37,7 +36,6 @@ void writeDefaultBitGpio( void )
 {
   writeBitGpio(ONE);
 }
-
 
 inline int BitToInt(Bit myBit)
 {
