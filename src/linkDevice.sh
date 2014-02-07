@@ -3,7 +3,7 @@
 source ./settings.sh 
 
 
-insmod ${MODULENAME}.ko || exit 1
+insmod ${MODULENAME}.ko GpioPort=2 || exit 1
 
 
 # mknod /dev/lezen c 249 0

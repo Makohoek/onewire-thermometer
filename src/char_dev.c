@@ -17,6 +17,8 @@
 #include "thermOperations.h"
 #include "bitOperations.h"
 #include "protocolOperations.h"
+#include <linux/types.h> // include added for autocompletion
+#include <linux/delay.h>
 
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 1;
@@ -123,7 +125,38 @@ static int init(void)
   }
 
   initializeBitOperations(GpioPort);
+ 
+  /* attempt to read temperature */
+//  sendInitializationSequence();
+//  writeROMCommand(SKIP_ROM);
+//  writeFunctionCommand(CONVERT_TEMP);
+//  Bit statusConversion;
+//  do
+//  {
+//    statusConversion = readBitFromBus();
+//  }while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
+//
+//  sendInitializationSequence();
+//  writeROMCommand(SKIP_ROM);
+//  writeFunctionCommand(READ_SCRATCHPAD);
+//  
+//  int i;
+//#define blah 9
+//  u8 result[blah] = {0};
+//  for ( i = 0; i < blah; i++ )
+//  {
+//    result[i] = readByteFromBus(); 
+//  }
+
   sendInitializationSequence();
+  writeROMCommand(READ_ROM);
+#define blah 9
+  u8 result[blah] = {0};
+  int i;
+  for ( i = 0; i < blah; i++ )
+  {
+    result[i] = readByteFromBus();
+  }
 
   return(errorCode);
 }
