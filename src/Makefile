@@ -1,4 +1,4 @@
-KERNEL_DIR=/media/storage/linux-sunxi-sunxi-v3.4.67-r0/
+KERNEL_DIR=/media/storage/linux-sunxi/
 ifneq ($(KERNELRELEASE),)
 	obj-m := therm.o
 	therm-objs := char_dev.o bitOperations.o protocolOperations.o thermOperations.o
