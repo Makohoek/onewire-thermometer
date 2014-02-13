@@ -24,3 +24,65 @@ int readTemperature( void )
 //  //performFunctionCommand();
 //}
 //
+
+int isBitIdZERO(Bit bit, Bit complementaryBit)
+{
+  return (ZERO == bit && ONE == complementaryBit);
+}
+
+int isBitIdONE(Bit bit, Bit complementaryBit)
+{
+  return (ONE == bit && ZERO == complementaryBit);
+}
+
+/*
+ * discovery process of the sensors IDs.
+ * Should be called after a SEARCH_ROM Command
+ */
+void performDiscovery( void )
+{
+  printk(KERN_INFO "Performing discovery on the bus\n");
+  int i;
+  Bit discoveredSensorID[64];
+  for ( i = 0; i < 64; i++ )
+  {
+    Bit responseBit;
+    Bit bit = readBitFromBus();
+    Bit complementaryBit = readBitFromBus();
+    if (isBitIdZERO(bit, complementaryBit))
+    {
+      responseBit = ZERO;
+    }
+    else if (isBitIdONE(bit, complementaryBit))
+    {
+      responseBit = ONE;
+    }
+    else
+    {
+      // we dont know. We have to select which one we want to keep
+      // Arbitrary we want to keep the ONE :)
+      responseBit = ONE;
+    }
+    // select which one can survive
+    writeBitToBus(responseBit);
+    discoveredSensorID[i] = responseBit;
+  }
+  printk(KERN_INFO "End of discovery on the bus\n");
+  printk(KERN_INFO "Received this ID: ");
+  for ( i = 0; i < 64; i++ )
+  {
+    printk(KERN_INFO "%d", discoveredSensorID[i] == ZERO ? 0:1);
+  }
+}
+
+void writeFunctionCommand(FunctionCommand functionCommand)
+{
+  writeByteToBus(functionCommand);
+}
+
+void writeROMCommand(ROMCommand romCommand)
+{
+  writeByteToBus(romCommand);
+}
+
+

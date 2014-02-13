@@ -16,8 +16,6 @@
 
 void sendInitializationSequence( void );
 
-void writeFunctionCommand(FunctionCommand command);
-void writeROMCommand(ROMCommand romcommand);
 
 void writeByteToBus(u8 byteToWrite);
 u8 readByteFromBus( void );

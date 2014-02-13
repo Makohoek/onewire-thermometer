@@ -125,7 +125,10 @@ static int init(void)
   }
 
   initializeBitOperations(GpioPort);
- 
+  sendInitializationSequence();
+  writeROMCommand(SEARCH_ROM);
+  performDiscovery();
+
   /* attempt to read temperature */
 //  sendInitializationSequence();
 //  writeROMCommand(SKIP_ROM);

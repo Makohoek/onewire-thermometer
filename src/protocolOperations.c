@@ -126,15 +126,3 @@ Bit readBitFromBus( void )
 
   return result;
 }
-
-void writeFunctionCommand(FunctionCommand functionCommand)
-{
-  writeByteToBus(functionCommand);
-}
-
-void writeROMCommand(ROMCommand romCommand)
-{
-  writeByteToBus(romCommand);
-}
-
-

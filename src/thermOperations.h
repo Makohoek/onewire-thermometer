@@ -9,6 +9,11 @@
 #ifndef __INC_THERMOPERATIONS__
 #define __INC_THERMOPERATIONS__
 #include "bitOperations.h"
+#include "protocolOperations.h"
+
+#include <linux/module.h>
+#include <linux/moduleparam.h>
+#include <linux/kernel.h>
 
 typedef enum 
 {
@@ -31,5 +36,8 @@ typedef enum
 
 
 int readTemperature( void ); //TODO
+void performDiscovery( void );
+void writeFunctionCommand(FunctionCommand command);
+void writeROMCommand(ROMCommand romcommand);
 
 #endif /* end of include guard: __INC_THERMOPERATIONS__ */
