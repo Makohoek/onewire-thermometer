@@ -8,18 +8,17 @@
  */
 #include "protocolOperations.h"
 
-#if 0
 #define INITIALIZATION_LOW_DELAY 480
 #define INITIALIZATION_HIGH_DELAY 60
-#define WRITE_ONE_LOW_DELAY 15 //6
+#define WRITE_ONE_LOW_DELAY 15 
 #define WRITE_ONE_HIGH_DELAY 45
 #define WRITE_ZERO_PULL_DOWN_DELAY 60
 #define READ_PULL_DOWN_DELAY 6
 #define READ_HIGH_DELAY 9
 #define READ_BIT_DELAY 45 // can be changed to 55 as specified in code
-#endif
 
 //Values from code
+#if 0
 #define INITIALIZATION_LOW_DELAY 480
 #define INITIALIZATION_HIGH_DELAY 60
 #define WRITE_ONE_LOW_DELAY 6
@@ -28,6 +27,7 @@
 #define READ_PULL_DOWN_DELAY 6
 #define READ_HIGH_DELAY 9
 #define READ_BIT_DELAY 55 // can be changed to 55 as specified in code
+#endif
 
 static void writeOneToBus( void );
 static void writeZeroToBus( void );
@@ -66,7 +66,7 @@ void writeByteToBus(u8 byteToWrite)
     Bit bitToWrite = intToBit((byteToWrite >> i) & 0x1);
     writeBitToBus(bitToWrite);
   }
-  printk(KERN_INFO "Debug: send a byte (0x%2x) to the bus\n",  byteToWrite);
+  //printk(KERN_INFO "Debug: send a byte (0x%2x) to the bus\n",  byteToWrite);
 }
 
 u8 readByteFromBus( void )
@@ -78,7 +78,7 @@ u8 readByteFromBus( void )
     Bit readedBit = readBitFromBus();
     result |= BitToInt(readedBit) << i;
   }
-  printk(KERN_INFO "Debug: received a byte (0x%2x) from the bus\n",  result);
+  //printk(KERN_INFO "Debug: received a byte (0x%2x) from the bus\n",  result);
   return (result);
 }
 
@@ -104,7 +104,7 @@ static void writeOneToBus( void )
 
   /* recovery time */
   writeDefaultBitGpio();
-  udelay(1);
+  udelay(10);
 }
 
 static void writeZeroToBus( void )
@@ -133,10 +133,9 @@ Bit readBitFromBus( void )
   // data from the DS18B20 is valid 15us after falling edge
   result = readBitGpio();
 
-  udelay(READ_BIT_DELAY); //45
+  udelay(READ_BIT_DELAY);
+  //recovery time
   writeDefaultBitGpio();
-
-   udelay(1);
-
+  udelay(10);
   return result;
 }

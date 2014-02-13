@@ -26,7 +26,7 @@ static const unsigned char NB_OF_MINORS = 1;
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 /* Module parameters */
-static int GpioPort = -1;
+static int GpioPort = 2;
 
 /* Standard character device operations */
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset);
@@ -123,43 +123,34 @@ static int init(void)
     printk(KERN_ALERT ">>> ERROR cdev_add\n");
     return -EINVAL;
   }
-
   initializeBitOperations(GpioPort);
+  
   sendInitializationSequence();
   writeROMCommand(SEARCH_ROM);
   performDiscovery();
 
   /* attempt to read temperature */
-//  sendInitializationSequence();
-//  writeROMCommand(SKIP_ROM);
-//  writeFunctionCommand(CONVERT_TEMP);
-//  Bit statusConversion;
-//  do
-//  {
-//    statusConversion = readBitFromBus();
-//  }while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
-//
-//  sendInitializationSequence();
-//  writeROMCommand(SKIP_ROM);
-//  writeFunctionCommand(READ_SCRATCHPAD);
-//  
-//  int i;
-//#define blah 9
-//  u8 result[blah] = {0};
-//  for ( i = 0; i < blah; i++ )
-//  {
-//    result[i] = readByteFromBus(); 
-//  }
+  //sendInitializationSequence();
+  //writeROMCommand(SKIP_ROM);
+  //writeFunctionCommand(CONVERT_TEMP);
+  //Bit statusConversion;
+  //do
+  //{
+  //  statusConversion = readBitFromBus();
+  //}while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
 
-  sendInitializationSequence();
-  writeROMCommand(READ_ROM);
-#define blah 9
-  u8 result[blah] = {0};
-  int i;
-  for ( i = 0; i < blah; i++ )
-  {
-    result[i] = readByteFromBus();
-  }
+  //sendInitializationSequence();
+  //writeROMCommand(SKIP_ROM);
+  //writeFunctionCommand(READ_SCRATCHPAD);
+  //
+  //int i;
+//#define blah 9
+  //u8 result[blah] = {0};
+  //for ( i = 0; i < blah; i++ )
+  //{
+  //  result[i] = readByteFromBus();
+  //  printk(KERN_INFO "%x", result[i]);
+  //}
 
   return(errorCode);
 }

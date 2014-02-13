@@ -41,7 +41,8 @@ int isBitIdONE(Bit bit, Bit complementaryBit)
  */
 void performDiscovery( void )
 {
-  printk(KERN_INFO "Performing discovery on the bus\n");
+  //printk(KERN_INFO "Performing discovery on the bus\n");
+  int protocolRespected = 1;
   int i;
   Bit discoveredSensorID[64];
   for ( i = 0; i < 64; i++ )
@@ -57,11 +58,15 @@ void performDiscovery( void )
     {
       responseBit = ONE;
     }
-    else
+    else if (bit == ONE && complementaryBit == ONE)
+    {
+      protocolRespected = 0;
+    }
+    else 
     {
       // we dont know. We have to select which one we want to keep
       // Arbitrary we want to keep the ONE :)
-      responseBit = ONE;
+      responseBit = ZERO;
     }
     // select which one can survive
     writeBitToBus(responseBit);
@@ -72,6 +77,10 @@ void performDiscovery( void )
   for ( i = 0; i < 64; i++ )
   {
     printk(KERN_INFO "%d", discoveredSensorID[i] == ZERO ? 0:1);
+  }
+  if (!protocolRespected)
+  {
+    printk(KERN_INFO "Discovery protocol is not respected\n");
   }
 }
 
