@@ -15,7 +15,7 @@
 #define WRITE_ZERO_PULL_DOWN_DELAY 60
 #define READ_PULL_DOWN_DELAY 6
 #define READ_HIGH_DELAY 9
-#define READ_BIT_DELAY 55 // can be changed to 45 as described the documentation
+#define READ_BIT_DELAY 45 // can be changed to 55 as specified in code
 
 static void writeOneToBus( void );
 static void writeZeroToBus( void );
@@ -114,9 +114,9 @@ Bit readBitFromBus( void )
 {
   Bit result;
   writeBitGpio(ZERO);
-  udelay(READ_PULL_DOWN_DELAY);
+  udelay(READ_PULL_DOWN_DELAY); //6
   writeBitGpio(ONE);
-  udelay(READ_HIGH_DELAY);
+  udelay(READ_HIGH_DELAY); //9
 
   // data from the DS18B20 is valid 15us after falling edge
   result = readBitGpio();
