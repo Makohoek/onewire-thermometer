@@ -8,14 +8,26 @@
  */
 #include "protocolOperations.h"
 
+#if 0
 #define INITIALIZATION_LOW_DELAY 480
 #define INITIALIZATION_HIGH_DELAY 60
-#define WRITE_ONE_LOW_DELAY 15
+#define WRITE_ONE_LOW_DELAY 15 //6
 #define WRITE_ONE_HIGH_DELAY 45
 #define WRITE_ZERO_PULL_DOWN_DELAY 60
 #define READ_PULL_DOWN_DELAY 6
 #define READ_HIGH_DELAY 9
 #define READ_BIT_DELAY 45 // can be changed to 55 as specified in code
+#endif
+
+//Values from code
+#define INITIALIZATION_LOW_DELAY 480
+#define INITIALIZATION_HIGH_DELAY 60
+#define WRITE_ONE_LOW_DELAY 6
+#define WRITE_ONE_HIGH_DELAY 64
+#define WRITE_ZERO_PULL_DOWN_DELAY 60
+#define READ_PULL_DOWN_DELAY 6
+#define READ_HIGH_DELAY 9
+#define READ_BIT_DELAY 55 // can be changed to 55 as specified in code
 
 static void writeOneToBus( void );
 static void writeZeroToBus( void );
@@ -102,7 +114,7 @@ static void writeZeroToBus( void )
 
   /* recovery time */
   writeDefaultBitGpio();
-  udelay(1);
+  udelay(10);
 }
 
 
@@ -121,8 +133,10 @@ Bit readBitFromBus( void )
   // data from the DS18B20 is valid 15us after falling edge
   result = readBitGpio();
 
-  udelay(READ_BIT_DELAY);
+  udelay(READ_BIT_DELAY); //45
   writeDefaultBitGpio();
+
+   udelay(1);
 
   return result;
 }
