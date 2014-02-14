@@ -22,10 +22,10 @@ void writeBitGpio( Bit bitToWrite )
   gpio_set_value(mGpioPin, bit);
 }
 
-void pullBus(void)
+void holdBus(Bit initialBit)
 {
-    gpio_direction_output(mGpioPin, bit);
-
+  int bit = BitToInt(initialBit);
+  gpio_direction_output(mGpioPin, bit);
 }
 
 Bit readBitGpio( void )
@@ -39,7 +39,7 @@ Bit readBitGpio( void )
 
 void writeDefaultBitGpio( void )
 {
-  pullBus();
+  holdBus(ONE);
   writeBitGpio(ONE);
 }
 

@@ -14,7 +14,7 @@
 #include <linux/types.h> // include added for autocompletion
 #include <linux/delay.h>
 
-void sendInitializationSequence( void );
+int sendInitializationSequence( void );
 
 void writeByteToBus(u8 byteToWrite);
 u8 readByteFromBus( void );

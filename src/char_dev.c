@@ -123,7 +123,16 @@ static int init(void)
     printk(KERN_ALERT ">>> ERROR cdev_add\n");
     return -EINVAL;
   }
-  initializeBitOperations(GpioPort);
+  int initValue = initializeBitOperations(GpioPort);
+  if (initValue == 0)
+  {
+    printk(KERN_INFO "Init is OK");
+  }
+  else
+  {
+    printk(KERN_INFO "No device answered");
+  }
+
   
   sendInitializationSequence();
   writeROMCommand(SEARCH_ROM);
