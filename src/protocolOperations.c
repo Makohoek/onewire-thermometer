@@ -37,6 +37,7 @@ void sendInitializationSequence( void )
   Bit result;
 
   /* generate a reset pulse */
+  pullBus();
   writeBitGpio(ZERO);
   udelay(INITIALIZATION_LOW_DELAY);
   releaseBus();
@@ -95,6 +96,7 @@ void writeBitToBus( Bit bitToWrite )
 
 static void writeOneToBus( void )
 {
+  pullBus();
   writeBitGpio(ZERO);
   udelay(WRITE_ONE_LOW_DELAY);
   releaseBus();
@@ -107,6 +109,7 @@ static void writeOneToBus( void )
 
 static void writeZeroToBus( void )
 {
+  pullBus();
   writeBitGpio(ZERO);
   udelay(WRITE_ZERO_PULL_DOWN_DELAY);
 
@@ -123,6 +126,7 @@ static void writeZeroToBus( void )
 Bit readBitFromBus( void )
 {
   Bit result;
+  pullBus();
   writeBitGpio(ZERO);
   udelay(READ_PULL_DOWN_DELAY);
   releaseBus();
