@@ -16,7 +16,6 @@
 
 void sendInitializationSequence( void );
 
-
 void writeByteToBus(u8 byteToWrite);
 u8 readByteFromBus( void );
 

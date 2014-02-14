@@ -55,4 +55,8 @@ static void assertPinIsInitialized( )
   }
 }
 
+void releaseBus( void )
+{
+  gpio_direction_input( mGpioPin );
+}
 

@@ -13,9 +13,9 @@
 #define WRITE_ONE_LOW_DELAY 15 
 #define WRITE_ONE_HIGH_DELAY 45
 #define WRITE_ZERO_PULL_DOWN_DELAY 60
-#define READ_PULL_DOWN_DELAY 6
-#define READ_HIGH_DELAY 9
-#define READ_BIT_DELAY 45 // can be changed to 55 as specified in code
+#define READ_PULL_DOWN_DELAY 3
+#define READ_HIGH_DELAY 3
+#define READ_BIT_DELAY 54 // can be changed to 55 as specified in code
 
 //Values from code
 #if 0
@@ -32,21 +32,20 @@
 static void writeOneToBus( void );
 static void writeZeroToBus( void );
 
-
 void sendInitializationSequence( void )
 {
-  Bit result; 
+  Bit result;
 
   /* generate a reset pulse */
   writeBitGpio(ZERO);
   udelay(INITIALIZATION_LOW_DELAY);
-
-  writeBitGpio(ONE);
+  releaseBus();
+  
   udelay(INITIALIZATION_HIGH_DELAY);
 
   /* read a presence pulse */
   result = readBitGpio();
-  msleep(1);
+  //msleep(1);
   if (result == ZERO)
   {
     printk(KERN_INFO "Device is present and answered\n");
@@ -55,7 +54,7 @@ void sendInitializationSequence( void )
   {
     printk(KERN_ALERT "ERROR: No device answered to initialization sequence\n");
   }
-  writeDefaultBitGpio();
+  releaseBus();
 }
 
 void writeByteToBus(u8 byteToWrite)
@@ -82,7 +81,6 @@ u8 readByteFromBus( void )
   return (result);
 }
 
-
 void writeBitToBus( Bit bitToWrite )
 {
   if ( bitToWrite == ONE ) 
@@ -99,12 +97,12 @@ static void writeOneToBus( void )
 {
   writeBitGpio(ZERO);
   udelay(WRITE_ONE_LOW_DELAY);
-  writeBitGpio(ONE);
+  releaseBus();
   udelay(WRITE_ONE_HIGH_DELAY);
 
   /* recovery time */
-  writeDefaultBitGpio();
-  udelay(10);
+  releaseBus();
+  udelay(2);
 }
 
 static void writeZeroToBus( void )
@@ -113,8 +111,8 @@ static void writeZeroToBus( void )
   udelay(WRITE_ZERO_PULL_DOWN_DELAY);
 
   /* recovery time */
-  writeDefaultBitGpio();
-  udelay(10);
+  releaseBus();
+  udelay(2);
 }
 
 
@@ -126,16 +124,17 @@ Bit readBitFromBus( void )
 {
   Bit result;
   writeBitGpio(ZERO);
-  udelay(READ_PULL_DOWN_DELAY); //6
-  writeBitGpio(ONE);
-  udelay(READ_HIGH_DELAY); //9
+  udelay(READ_PULL_DOWN_DELAY);
+  releaseBus();
+  udelay(READ_HIGH_DELAY);
 
   // data from the DS18B20 is valid 15us after falling edge
   result = readBitGpio();
 
   udelay(READ_BIT_DELAY);
   //recovery time
-  writeDefaultBitGpio();
-  udelay(10);
+  releaseBus();
+  udelay(2);
+  
   return result;
 }
