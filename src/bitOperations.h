@@ -25,6 +25,7 @@ void writeBitGpio( Bit bitToWrite );
 Bit readBitGpio( void );
 
 void releaseBus( void );
+void pullBus(void);
 void writeDefaultBitGpio( void );
 
 inline int BitToInt(Bit myBit);

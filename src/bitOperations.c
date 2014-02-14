@@ -19,8 +19,13 @@ void writeBitGpio( Bit bitToWrite )
   int bit;
   assertPinIsInitialized();
   bit = BitToInt(bitToWrite);
-  gpio_direction_output(mGpioPin, bit);
   gpio_set_value(mGpioPin, bit);
+}
+
+void pullBus(void)
+{
+    gpio_direction_output(mGpioPin, bit);
+
 }
 
 Bit readBitGpio( void )
@@ -34,6 +39,7 @@ Bit readBitGpio( void )
 
 void writeDefaultBitGpio( void )
 {
+  pullBus();
   writeBitGpio(ONE);
 }
 
