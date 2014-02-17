@@ -1,10 +1,9 @@
-/*
+/**
  * Mattijs Korpershoek
  * <mattijs.korpershoek@gmail.com>
  * Alexandre Montilla
  * <alexandre.montilla@gmail.com>
  */
-/* Includes */
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
@@ -124,6 +123,7 @@ static int init(void)
     return -EINVAL;
   }
   int initValue = initializeBitOperations(GpioPort);
+  
   if (initValue == 0)
   {
     printk(KERN_INFO "Init is OK");
@@ -160,6 +160,8 @@ static int init(void)
   //  result[i] = readByteFromBus();
   //  printk(KERN_INFO "%x", result[i]);
   //}
+
+  deleteBitOperations();
 
   return(errorCode);
 }
