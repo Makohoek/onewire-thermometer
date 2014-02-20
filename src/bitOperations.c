@@ -41,7 +41,7 @@ int holdBus(Bit initialBit)
 {
   int bit, errorOccured;
   bit = BitToInt(initialBit);
-  errorOccured = gpio_direction_output(mGpioPin, bit);
+  errorOccured = gpio_direction_output(mGpioPin, initialBit);
   if (errorOccured)
   {
     printk(KERN_ALERT "ERROR occured while attempting to hold the one wire bus\n");

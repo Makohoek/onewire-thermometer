@@ -37,14 +37,15 @@ int sendInitializationSequence( void )
   Bit result;
   /* generate a reset pulse */
   holdBus(ZERO);
-  writeBitGpio(ZERO);
   udelay(485);
+  writeBitGpio(ONE);
   releaseBus();
   udelay(60);
 
   /* read a presence pulse */
   result = readBitGpio();
   udelay(240);
+  Bit result2 = readBitGpio();
   if (result == ZERO)
   {
     printk(KERN_INFO "Device is present and answered\n");
@@ -67,7 +68,7 @@ void writeByteToBus(u8 byteToWrite)
     Bit bitToWrite = intToBit((byteToWrite >> i) & 0x1);
     writeBitToBus(bitToWrite);
   }
-  //printk(KERN_INFO "Debug: send a byte (0x%2x) to the bus\n",  byteToWrite);
+ //printk(KERN_INFO "Debug: send a byte (0x%2x) to the bus\n",  byteToWrite);
 }
 
 u8 readByteFromBus( void )
@@ -87,10 +88,12 @@ void writeBitToBus( Bit bitToWrite )
 {
   if ( bitToWrite == ONE )
   {
+    //printk(KERN_INFO "Writing one to BUS");
     writeOneToBus();
   }
   else
   {
+    //printk(KERN_INFO "Writing zero to BUS");
     writeZeroToBus();
   }
 }
@@ -100,10 +103,11 @@ static void writeOneToBus( void )
   if (holdBus(ZERO))
   {
     writeBitGpio(ZERO);
-    udelay(2);
+    udelay(5);
     releaseBus();
-    udelay(13);
-    udelay(WRITE_ONE_HIGH_DELAY);
+    udelay(10);
+
+    udelay(45);
     udelay(1);
   }
 }
@@ -113,7 +117,7 @@ static void writeZeroToBus( void )
   if (holdBus(ZERO))
   {
     writeBitGpio(ZERO);
-    udelay(WRITE_ZERO_PULL_DOWN_DELAY);
+    udelay(60);
     /* recovery time */
     releaseBus();
     udelay(1);
@@ -131,13 +135,13 @@ Bit readBitFromBus( void )
   if(holdBus(ZERO))
   {
     writeBitGpio(ZERO);
-    udelay(3);
+    udelay(6);
     releaseBus();
-    udelay(8);
+    udelay(9);
 
     // data from the DS18B20 is valid 15us after falling edge
     result = readBitGpio();
-    udelay(4);
+    udelay(2);
 
     udelay(45);
 

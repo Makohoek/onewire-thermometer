@@ -131,38 +131,41 @@ static int init(void)
   {
     printk(KERN_ALERT "ERROR while calling initializeBitOperations()");
   }
+
+  printk(KERN_INFO "Sending an initialization sequence...\n");
+  sendInitializationSequence();
+  writeROMCommand(SEARCH_ROM);
+  performDiscovery();
+
+ /* attempt to read temperature */
+//   sendInitializationSequence();
+//   writeROMCommand(SKIP_ROM);
+//   writeFunctionCommand(CONVERT_TEMP);
+ //  Bit statusConversion;
+ //  do
+ //  {
+ //    statusConversion = readBitFromBus();
+ //  }while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
+ //
+   //sendInitializationSequence();
+   //writeROMCommand(SKIP_ROM);
+   //writeFunctionCommand(READ_SCRATCHPAD);
+//   int i;
+// #define blah 9
+//   u8 result[blah] = {0};
+//   for ( i = 0; i < blah; i++ )
+//   {
+//     result[i] = readByteFromBus();
+//   }
+//     
+//   for ( i = 0; i < blah; i++ )
+//   {
+//     printk(KERN_INFO "%x", result[i]);
+//   }
  
- printk(KERN_INFO "Sending an initialization sequence...\n");
- sendInitializationSequence();
- writeROMCommand(SEARCH_ROM);
- performDiscovery();
+ deleteBitOperations();
 
-  /* attempt to read temperature */
-  //sendInitializationSequence();
-  //writeROMCommand(SKIP_ROM);
-  //writeFunctionCommand(CONVERT_TEMP);
-  //Bit statusConversion;
-  //do
-  //{
-  //  statusConversion = readBitFromBus();
-  //}while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
-
-  //sendInitializationSequence();
-  //writeROMCommand(SKIP_ROM);
-  //writeFunctionCommand(READ_SCRATCHPAD);
-  //
-  //int i;
-//#define blah 9
-  //u8 result[blah] = {0};
-  //for ( i = 0; i < blah; i++ )
-  //{
-  //  result[i] = readByteFromBus();
-  //  printk(KERN_INFO "%x", result[i]);
-  //}
-
-  deleteBitOperations();
-
-  return(errorCode);
+ return(errorCode);
 }
 
 

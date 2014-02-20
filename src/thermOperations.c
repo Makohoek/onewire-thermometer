@@ -47,7 +47,7 @@ void performDiscovery( void )
   Bit discoveredSensorID[64];
   for ( i = 0; i < 64; i++ )
   {
-    Bit responseBit;
+    Bit responseBit = ZERO;
     Bit bit = readBitFromBus();
     Bit complementaryBit = readBitFromBus();
     if (isBitIdZERO(bit, complementaryBit))
@@ -66,7 +66,7 @@ void performDiscovery( void )
     {
       // we dont know. We have to select which one we want to keep
       // Arbitrary we want to keep the ONE :)
-      responseBit = ZERO;
+      responseBit = ONE;
     }
     // select which one can survive
     writeBitToBus(responseBit);
@@ -74,9 +74,12 @@ void performDiscovery( void )
   }
   printk(KERN_INFO "End of discovery on the bus\n");
   printk(KERN_INFO "Received this ID: ");
-  for ( i = 0; i < 64; i++ )
+  for ( i = 0; i < 64; i+=4 )
   {
-    printk(KERN_INFO "%d", discoveredSensorID[i] == ZERO ? 0:1);
+    printk(KERN_INFO "%d %d %d %d", discoveredSensorID[i] == ZERO ? 0:1,
+        discoveredSensorID[i] == ZERO ? 0:1,
+        discoveredSensorID[i+1] == ZERO ? 0:1,
+        discoveredSensorID[i+2] == ZERO ? 0:1);
   }
   if (!protocolRespected)
   {
