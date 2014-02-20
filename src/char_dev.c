@@ -123,20 +123,19 @@ static int init(void)
     return -EINVAL;
   }
   int initValue = initializeBitOperations(GpioPort);
-  
   if (initValue == 0)
   {
     printk(KERN_INFO "Init is OK");
   }
   else
   {
-    printk(KERN_INFO "No device answered");
+    printk(KERN_ALERT "ERROR while calling initializeBitOperations()");
   }
-
-  
-  sendInitializationSequence();
-  writeROMCommand(SEARCH_ROM);
-  performDiscovery();
+ 
+ printk(KERN_INFO "Sending an initialization sequence...\n");
+ sendInitializationSequence();
+ writeROMCommand(SEARCH_ROM);
+ performDiscovery();
 
   /* attempt to read temperature */
   //sendInitializationSequence();
@@ -170,6 +169,7 @@ static int init(void)
 static void cleanup(void)
 {
   int errorCode = 0;
+  deleteBitOperations();
   /* freeing memory and major,(s) */
   unregister_chrdev_region(dev,NB_OF_MINORS);
   cdev_del(myDevice);

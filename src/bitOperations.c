@@ -12,11 +12,20 @@ static void assertPinIsInitialized( void );
 
 int initializeBitOperations( int GpioPin )
 {
+  if (!gpio_is_valid(GpioPin))
+  {
+    printk(KERN_ALERT "ERROR: %d pin is not valid\n", GpioPin);
+    return -1;
+  }
   int errorOccured;
   // initialize the port we want to work on
   mGpioPin = GpioPin;
   // request the gpio device
   errorOccured = gpio_request(GpioPin, "One-Wire Bus");
+  if (errorOccured)
+  {
+    printk(KERN_ALERT "ERROR occured requesting the GPIO pin\n");
+  }
   return (errorOccured);
 }
 
@@ -28,7 +37,7 @@ void writeBitGpio( Bit bitToWrite )
   gpio_set_value(mGpioPin, bit);
 }
 
-void holdBus(Bit initialBit)
+int holdBus(Bit initialBit)
 {
   int bit, errorOccured;
   bit = BitToInt(initialBit);
@@ -37,15 +46,18 @@ void holdBus(Bit initialBit)
   {
     printk(KERN_ALERT "ERROR occured while attempting to hold the one wire bus\n");
   }
+  return errorOccured;
 }
 
-void releaseBus( void )
+int releaseBus( void )
 {
+  writeBitGpio(ONE);
   int errorOccured = gpio_direction_input( mGpioPin );
   if (errorOccured)
   {
     printk(KERN_ALERT "ERROR occured while releasing the one wire bus\n");
   }
+  return errorOccured;
 }
 
 Bit readBitGpio( void )

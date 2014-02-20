@@ -21,12 +21,13 @@ typedef enum
 } Bit;
 
 int initializeBitOperations( int GpioPin );
+void deleteBitOperations( void );
+
+int releaseBus( void );
+int holdBus(Bit initialBit);
+
 void writeBitGpio( Bit bitToWrite );
 Bit readBitGpio( void );
-
-void releaseBus( void );
-void holdBus(Bit initialBit);
-void writeDefaultBitGpio( void );
 
 inline int BitToInt(Bit myBit);
 inline Bit intToBit(int myInt);

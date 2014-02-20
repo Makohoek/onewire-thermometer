@@ -2,9 +2,10 @@
 
 source ./settings.sh 
 
-
+#dmesg --clear
 insmod ${MODULENAME}.ko GpioPort=2 || exit 1
-
+dmesg | less
+./unlinkDevice.sh
 
 # mknod /dev/lezen c 249 0
 # mknod /dev/lezenKapot c 249 1
