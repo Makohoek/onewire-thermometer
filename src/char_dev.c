@@ -74,7 +74,6 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   return 0;
 }
 
-
 static int open(struct inode *in, struct file *f)
 {
   int errorCode = 0;
@@ -93,6 +92,50 @@ static int release(struct inode *in, struct file *f)
   return errorCode;
 }
 
+static void test_gpio_led()
+{
+  // turns on the gpio led to show something actually working
+  int i;
+  int ledPin = 12;
+  int initValue = initializeBitOperations(ledPin);
+  if (initValue == 0)
+  {
+    printk(KERN_INFO "Gpio initialized");
+  }
+  else
+  {
+    printk(KERN_ALERT "ERROR while calling initializeGPIO");
+  }
+  printk(KERN_INFO "Blinking led 3 times\n");
+  for ( i = 0; i < 3; i++ )
+  {
+    holdBus(ONE);
+    writeBitGpio(ONE);
+    msleep(1000);
+    releaseBus();
+    msleep(1000);
+  }
+}
+
+static void test_discovery_process(void)
+{
+  /* displays GPIO port */
+  printk(KERN_INFO "GpioPort=%d\n", GpioPort);
+  int initValue = initializeBitOperations(GpioPort);
+  if (initValue == 0)
+  {
+    printk(KERN_INFO "Gpio initialized");
+  }
+  else
+  {
+    printk(KERN_ALERT "ERROR while calling initializeGPIO");
+  }
+  printk(KERN_INFO "Sending an initialization sequence...\n");
+  sendInitializationSequence();
+  writeROMCommand(SEARCH_ROM);
+  performDiscovery();
+}
+
 
 static int init(void)
 {
@@ -107,8 +150,6 @@ static int init(void)
   /* display majors/minor */
   printk(KERN_INFO "Init allocated (major, minor)=(%d,%d)\n",MAJOR(dev),MINOR(dev));
 
-  /* displays GPIO port */
-  printk(KERN_INFO "GpioPort=%d\n", GpioPort);
 
   /* allocating memory for our character device and linking fileOperations */
   myDevice = cdev_alloc();
@@ -122,20 +163,10 @@ static int init(void)
     printk(KERN_ALERT ">>> ERROR cdev_add\n");
     return -EINVAL;
   }
-  int initValue = initializeBitOperations(GpioPort);
-  if (initValue == 0)
-  {
-    printk(KERN_INFO "Init is OK");
-  }
-  else
-  {
-    printk(KERN_ALERT "ERROR while calling initializeBitOperations()");
-  }
 
-  printk(KERN_INFO "Sending an initialization sequence...\n");
-  sendInitializationSequence();
-  writeROMCommand(SEARCH_ROM);
-  performDiscovery();
+ // test_gpio_led();
+  test_discovery_process();
+
 
  /* attempt to read temperature */
 //   sendInitializationSequence();

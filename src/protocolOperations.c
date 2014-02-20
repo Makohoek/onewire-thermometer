@@ -46,7 +46,7 @@ int sendInitializationSequence( void )
   result = readBitGpio();
   udelay(240);
   Bit result2 = readBitGpio();
-  if (result == ZERO)
+  if (result == ZERO && result2 == ONE) // detected a presence pulse
   {
     printk(KERN_INFO "Device is present and answered\n");
   }
@@ -55,8 +55,6 @@ int sendInitializationSequence( void )
     printk(KERN_ALERT "ERROR: No device answered to initialization sequence\n");
   }
   udelay(240);
-  udelay(1);
-
   return result;
 }
 
@@ -67,6 +65,7 @@ void writeByteToBus(u8 byteToWrite)
   {
     Bit bitToWrite = intToBit((byteToWrite >> i) & 0x1);
     writeBitToBus(bitToWrite);
+    udelay(5);
   }
  //printk(KERN_INFO "Debug: send a byte (0x%2x) to the bus\n",  byteToWrite);
 }
@@ -79,6 +78,7 @@ u8 readByteFromBus( void )
   {
     Bit readedBit = readBitFromBus();
     result |= BitToInt(readedBit) << i;
+    udelay(5);
   }
   //printk(KERN_INFO "Debug: received a byte (0x%2x) from the bus\n",  result);
   return (result);
@@ -103,12 +103,16 @@ static void writeOneToBus( void )
   if (holdBus(ZERO))
   {
     writeBitGpio(ZERO);
-    udelay(5);
-    releaseBus();
-    udelay(10);
-
-    udelay(45);
-    udelay(1);
+    udelay(3);
+    if(releaseBus())
+    {
+      printk(KERN_ALERT "Impossible to RELEASE BUS");
+    }
+    udelay(67);
+  }
+  else
+  {
+    printk(KERN_ALERT "impossible to HOLD BUS\n");
   }
 }
 
@@ -117,10 +121,16 @@ static void writeZeroToBus( void )
   if (holdBus(ZERO))
   {
     writeBitGpio(ZERO);
-    udelay(60);
-    /* recovery time */
-    releaseBus();
-    udelay(1);
+    udelay(3);
+    udelay(67);
+    if(releaseBus())
+    {
+      printk(KERN_ALERT "Impossible to RELEASE BUS");
+    }
+  }
+  else
+  {
+    printk(KERN_ALERT "impossible to HOLD BUS\n");
   }
 }
 
@@ -131,22 +141,23 @@ static void writeZeroToBus( void )
  */
 Bit readBitFromBus( void )
 {
-  Bit result;
+  Bit result = ONE;
   if(holdBus(ZERO))
   {
     writeBitGpio(ZERO);
-    udelay(6);
-    releaseBus();
+    udelay(3);
+    if(releaseBus())
+    {
+      printk(KERN_ALERT "Impossible to RELEASE BUS");
+    }
     udelay(9);
-
     // data from the DS18B20 is valid 15us after falling edge
     result = readBitGpio();
-    udelay(2);
-
-    udelay(45);
-
-    //recovery time
-    udelay(1);
+    udelay(58);
+  }
+  else
+  {
+    printk(KERN_ALERT "impossible to HOLD BUS\n");
   }
 
   return result;

@@ -11,7 +11,7 @@
 
 #include "bitOperations.h"
 #include "thermOperations.h"
-#include <linux/types.h> // include added for autocompletion
+#include <linux/types.h> 
 #include <linux/delay.h>
 
 int sendInitializationSequence( void );
