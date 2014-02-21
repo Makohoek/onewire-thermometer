@@ -14,6 +14,9 @@
 #ifndef __INC_BITOPERATIONS__
 #define __INC_BITOPERATIONS__
 
+#include <linux/gpio.h>
+#include "dmesgLogging.h"
+
 typedef enum 
 {
   ZERO = 0,
@@ -29,7 +32,7 @@ int holdBus(Bit initialBit);
 void writeBitGpio( Bit bitToWrite );
 Bit readBitGpio( void );
 
-inline int BitToInt(Bit myBit);
-inline Bit intToBit(int myInt);
+int BitToInt(Bit myBit);
+Bit intToBit(int myInt);
 
 #endif /* end of include guard: __INC_BITOPERATIONS__ */

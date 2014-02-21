@@ -13,11 +13,13 @@
 #include <linux/fs.h>
 #include <asm/uaccess.h>
 #include <linux/sched.h>
+#include <linux/types.h> // include added for autocompletion
+#include <linux/delay.h>
+
 #include "thermOperations.h"
 #include "bitOperations.h"
 #include "protocolOperations.h"
-#include <linux/types.h> // include added for autocompletion
-#include <linux/delay.h>
+#include "dmesgLogging.h"
 
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 1;
@@ -54,19 +56,19 @@ struct cdev *myDevice;
 
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
 {
-  printk(KERN_INFO "Read called!\n");
+  logk((KERN_INFO "Read called!\n"));
 
   //   sizeToRead = MIN(myLinkedList->bufferSize - myLinkedList->beginReadIndex, size); // this condition is not valid for a non destructive read
   //
-  //      printk(KERN_INFO "BeginReadIndex: %ld from file\n", myLinkedList->beginReadIndex);
-  //      printk(KERN_INFO "Have to read %d from file\n", sizeToRead);
+  //      logk((KERN_INFO "BeginReadIndex: %ld from file\n", myLinkedList->beginReadIndex);
+  //      logk((KERN_INFO "Have to read %d from file\n", sizeToRead);
   //
   //   myBuffer = (char*)kmalloc(sizeof(char)*sizeToRead, GFP_KERNEL);
   //
   //   myLinkedList->readFromLinkedList(myLinkedList, myBuffer, sizeToRead);
   //
   //   sizeNotCopiedToUser = copy_to_user(buf, myBuffer, sizeToRead);
-  //   printk(KERN_INFO "Could not copy %d bytes to user\n", sizeNotCopiedToUser);
+  //   logk((KERN_INFO "Could not copy %d bytes to user\n", sizeNotCopiedToUser);
   //
   //   kfree(myBuffer);
   //
@@ -78,7 +80,7 @@ static int open(struct inode *in, struct file *f)
 {
   int errorCode = 0;
 
-  printk(KERN_INFO "Pid(%d) Open with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev));
+  logk((KERN_INFO "Pid(%d) Open with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
 
   return errorCode;
 }
@@ -87,12 +89,12 @@ static int release(struct inode *in, struct file *f)
 {
   int errorCode = 0;
 
-  printk(KERN_INFO "Pid(%d) Release with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev));
+  logk((KERN_INFO "Pid(%d) Release with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
 
   return errorCode;
 }
 
-static void test_gpio_led()
+static void test_gpio_led(void)
 {
   // turns on the gpio led to show something actually working
   int i;
@@ -100,13 +102,13 @@ static void test_gpio_led()
   int initValue = initializeBitOperations(ledPin);
   if (initValue == 0)
   {
-    printk(KERN_INFO "Gpio initialized");
+    logk((KERN_INFO "Gpio initialized"));
   }
   else
   {
-    printk(KERN_ALERT "ERROR while calling initializeGPIO");
+    logk((KERN_ALERT "ERROR while calling initializeGPIO"));
   }
-  printk(KERN_INFO "Blinking led 3 times\n");
+  logk((KERN_INFO "Blinking led 3 times\n"));
   for ( i = 0; i < 3; i++ )
   {
     holdBus(ONE);
@@ -121,38 +123,38 @@ static void test_gpio_led()
 static void test_discovery_process(void)
 {
   /* displays GPIO port */
-  printk(KERN_INFO "GpioPort=%d\n", GpioPort);
+  logk((KERN_INFO "GpioPort=%d\n", GpioPort));
   int initValue = initializeBitOperations(GpioPort);
   if (initValue == 0)
   {
-    printk(KERN_INFO "Gpio initialized");
+    logk((KERN_INFO "Gpio initialized"));
   }
   else
   {
-    printk(KERN_ALERT "ERROR while calling initializeGPIO");
+    logk((KERN_ALERT "ERROR while calling initializeGPIO"));
   }
-  printk(KERN_INFO "Sending an initialization sequence...\n");
+  logk((KERN_INFO "Sending an initialization sequence...\n"));
   sendInitializationSequence();
-//  writeROMCommand(SEARCH_ROM);
-//  performDiscovery();
+  writeROMCommand(SEARCH_ROM);
+  performDiscovery();
 
   deleteBitOperations();
 }
 
 static void test_temperature_process(void)
 {
-  printk(KERN_INFO "GpioPort=%d\n", GpioPort);
+  logk((KERN_INFO "GpioPort=%d\n", GpioPort));
   int initValue = initializeBitOperations(GpioPort);
   if (initValue == 0)
   {
-    printk(KERN_INFO "Gpio initialized");
+    logk((KERN_INFO "Gpio initialized"));
   }
   else
   {
-    printk(KERN_ALERT "ERROR while calling initializeGPIO");
+    logk((KERN_ALERT "ERROR while calling initializeGPIO"));
   }
  /* attempt to read temperature */
-  printk(KERN_INFO "Sending an initialization sequence...\n");
+  logk((KERN_INFO "Sending an initialization sequence...\n"));
    sendInitializationSequence();
    writeROMCommand(SKIP_ROM);
    writeFunctionCommand(CONVERT_TEMP);
@@ -175,7 +177,7 @@ static void test_temperature_process(void)
      
    for ( i = 0; i < blah; i++ )
    {
-     printk(KERN_INFO "%x", result[i]);
+     logk((KERN_INFO "%x", result[i]));
    }
 
  deleteBitOperations();
@@ -188,11 +190,11 @@ static int init(void)
   /* dynamic allocation for major/minors */
   if (alloc_chrdev_region(&dev, 0, NB_OF_MINORS, "sample") == -1)
   {
-    printk(KERN_ALERT ">>> ERROR alloc_chrdev_region\n");
+    logk((KERN_ALERT ">>> ERROR alloc_chrdev_region\n"));
     return -EINVAL;
   }
   /* display majors/minor */
-  printk(KERN_INFO "Init allocated (major, minor)=(%d,%d)\n",MAJOR(dev),MINOR(dev));
+  logk((KERN_INFO "Init allocated (major, minor)=(%d,%d)\n",MAJOR(dev),MINOR(dev)));
 
 
   /* allocating memory for our character device and linking fileOperations */
@@ -204,11 +206,11 @@ static int init(void)
   errorCode = cdev_add(myDevice,dev,NB_OF_MINORS);
   if (errorCode == -1)
   {
-    printk(KERN_ALERT ">>> ERROR cdev_add\n");
+    logk((KERN_ALERT ">>> ERROR cdev_add\n"));
     return -EINVAL;
   }
 
- // test_gpio_led();
+//  test_gpio_led();
   test_discovery_process();
 //  test_temperature_process();
 

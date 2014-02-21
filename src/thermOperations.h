@@ -10,6 +10,7 @@
 #define __INC_THERMOPERATIONS__
 #include "bitOperations.h"
 #include "protocolOperations.h"
+#include "dmesgLogging.h"
 
 #include <linux/module.h>
 #include <linux/moduleparam.h>

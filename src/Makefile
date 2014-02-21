@@ -1,9 +1,8 @@
-#KERNEL_DIR=/media/storage/linux-sunxi/
-KERNEL_DIR=/media/ExtendedLinux/linux-sunxi
+KERNEL_DIR=/media/storage/linux-sunxi/
+#KERNEL_DIR=/media/ExtendedLinux/linux-sunxi
 ifneq ($(KERNELRELEASE),)
-	obj-m := therm1.o
-	therm1-objs := char_dev.o bitOperations.o protocolOperations.o thermOperations.o
-	#therm1-objs := toggleLed.o
+	obj-m := therm.o
+	therm-objs := char_dev.o bitOperations.o protocolOperations.o thermOperations.o
 else
 	KERNEL_DIR ?= /lib/modules/$(shell uname -r)/build
 	PWD := $(shell pwd)

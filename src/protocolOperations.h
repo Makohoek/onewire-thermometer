@@ -11,6 +11,7 @@
 
 #include "bitOperations.h"
 #include "thermOperations.h"
+#include "dmesgLogging.h"
 #include <linux/types.h> 
 #include <linux/delay.h>
 
