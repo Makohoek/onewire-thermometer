@@ -61,7 +61,7 @@ void performDiscovery( void )
     }
     else if (bit == ONE && complementaryBit == ONE)
     {
-      logk((KERN_INFO "Discovery protocol (bit %d) is not respected!!\n", i));
+      printk(KERN_ALERT "Discovery protocol (bit %d) is not respected!!\n", i);
       responseBit = ZERO;
       return;
     }
@@ -77,14 +77,14 @@ void performDiscovery( void )
     udelay(2);
     discoveredSensorID[i] = responseBit;
   }
-  logk((KERN_INFO "End of discovery on the bus\n"));
-  logk((KERN_INFO "Received this ID: "));
+  printk(KERN_INFO "End of discovery on the bus\n");
+  printk(KERN_INFO "Received this ID: ");
   for ( i = 0; i < 64; i+=4 )
   {
-    logk((KERN_INFO "%d %d %d %d", discoveredSensorID[i] == ZERO ? 0:1,
+    printk(KERN_INFO "%d %d %d %d", discoveredSensorID[i] == ZERO ? 0:1,
         discoveredSensorID[i] == ZERO ? 0:1,
         discoveredSensorID[i+1] == ZERO ? 0:1,
-        discoveredSensorID[i+2] == ZERO ? 0:1));
+        discoveredSensorID[i+2] == ZERO ? 0:1);
   }
 }
 

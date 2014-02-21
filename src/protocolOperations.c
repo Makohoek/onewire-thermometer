@@ -112,12 +112,12 @@ static void writeOneToBus( void )
     logk((KERN_ALERT "impossible to HOLD BUS\n"));
   }
   writeBitGpio(ZERO);
-  udelay(10);
+  udelay(6);
   if(releaseBus() != 0)
   {
     logk((KERN_ALERT "Impossible to RELEASE BUS"));
   }
-  udelay(55);
+  udelay(64);
 }
 
 static void writeZeroToBus( void )
@@ -127,12 +127,12 @@ static void writeZeroToBus( void )
     logk((KERN_ALERT "impossible to HOLD BUS\n"));
   }
   writeBitGpio(ZERO);
-  udelay(65);
+  udelay(60);
   if(releaseBus() != 0)
   {
     logk((KERN_ALERT "Impossible to RELEASE BUS"));
   }
-  udelay(5);
+  udelay(10);
 }
 
 
@@ -148,15 +148,15 @@ Bit readBitFromBus( void )
     //logk((KERN_ALERT "impossible to HOLD BUS\n"));
   }
     writeBitGpio(ZERO);
-    udelay(3);
+    udelay(6);
     if(releaseBus() != 0)
     {
       logk((KERN_ALERT "Impossible to RELEASE BUS"));
     }
-    udelay(10);
+    udelay(9);
     // data from the DS18B20 is valid 15us after falling edge
     result = readBitGpio();
-    udelay(53);
+    udelay(55);
 
   return result;
 }
