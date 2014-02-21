@@ -95,12 +95,10 @@ void writeBitToBus( Bit bitToWrite )
 {
   if ( bitToWrite == ONE )
   {
-    //logk((KERN_INFO "Writing one to BUS"));
     writeOneToBus();
   }
   else
   {
-    //logk((KERN_INFO "Writing zero to BUS"));
     writeZeroToBus();
   }
 }
@@ -143,20 +141,23 @@ static void writeZeroToBus( void )
 Bit readBitFromBus( void )
 {
   Bit result = ONE;
+  unsigned long flags;
+  local_irq_save(flags); // disable interruptions here because of critical timing
   if (holdBus(ZERO) != 0)
   {
     //logk((KERN_ALERT "impossible to HOLD BUS\n"));
   }
-    writeBitGpio(ZERO);
-    udelay(6);
-    if(releaseBus() != 0)
-    {
-      logk((KERN_ALERT "Impossible to RELEASE BUS"));
-    }
-    udelay(9);
-    // data from the DS18B20 is valid 15us after falling edge
-    result = readBitGpio();
-    udelay(55);
+  writeBitGpio(ZERO);
+  udelay(6);
+  if(releaseBus() != 0)
+  {
+    logk((KERN_ALERT "Impossible to RELEASE BUS"));
+  }
+  udelay(9);
+  // data from the DS18B20 is valid 15us after falling edge
+  result = readBitGpio();
+  local_irq_restore(flags);
+  udelay(55);
 
   return result;
 }
