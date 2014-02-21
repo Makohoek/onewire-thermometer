@@ -48,9 +48,9 @@ void performDiscovery( void )
   {
     Bit responseBit = ZERO;
     Bit bit = readBitFromBus();
-    udelay(5);
+    udelay(2);
     Bit complementaryBit = readBitFromBus();
-    udelay(5);
+    udelay(2);
     if (isBitIdZERO(bit, complementaryBit))
     {
       responseBit = ZERO;
@@ -61,7 +61,7 @@ void performDiscovery( void )
     }
     else if (bit == ONE && complementaryBit == ONE)
     {
-      printk(KERN_INFO "Discovery protocol is not respected!!\n");
+      printk(KERN_INFO "Discovery protocol (bit %d) is not respected!!\n", i);
       responseBit = ZERO;
     }
     else 
@@ -73,7 +73,7 @@ void performDiscovery( void )
     }
     // select which one can survive
     writeBitToBus(responseBit);
-    udelay(5);
+    udelay(2);
     discoveredSensorID[i] = responseBit;
   }
   printk(KERN_INFO "End of discovery on the bus\n");

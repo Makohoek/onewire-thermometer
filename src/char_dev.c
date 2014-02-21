@@ -115,6 +115,7 @@ static void test_gpio_led()
     releaseBus();
     msleep(1000);
   }
+ deleteBitOperations();
 }
 
 static void test_discovery_process(void)
@@ -132,10 +133,53 @@ static void test_discovery_process(void)
   }
   printk(KERN_INFO "Sending an initialization sequence...\n");
   sendInitializationSequence();
-  writeROMCommand(SEARCH_ROM);
-  performDiscovery();
+//  writeROMCommand(SEARCH_ROM);
+//  performDiscovery();
+
+  deleteBitOperations();
 }
 
+static void test_temperature_process(void)
+{
+  printk(KERN_INFO "GpioPort=%d\n", GpioPort);
+  int initValue = initializeBitOperations(GpioPort);
+  if (initValue == 0)
+  {
+    printk(KERN_INFO "Gpio initialized");
+  }
+  else
+  {
+    printk(KERN_ALERT "ERROR while calling initializeGPIO");
+  }
+ /* attempt to read temperature */
+  printk(KERN_INFO "Sending an initialization sequence...\n");
+   sendInitializationSequence();
+   writeROMCommand(SKIP_ROM);
+   writeFunctionCommand(CONVERT_TEMP);
+//  Bit statusConversion;
+//  do
+//  {
+//    statusConversion = readBitFromBus();
+//  }while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
+//
+ sendInitializationSequence();
+ writeROMCommand(SKIP_ROM);
+ writeFunctionCommand(READ_SCRATCHPAD);
+   int i;
+ #define blah 9
+   u8 result[blah] = {0};
+   for ( i = 0; i < blah; i++ )
+   {
+     result[i] = readByteFromBus();
+   }
+     
+   for ( i = 0; i < blah; i++ )
+   {
+     printk(KERN_INFO "%x", result[i]);
+   }
+
+ deleteBitOperations();
+}
 
 static int init(void)
 {
@@ -166,35 +210,7 @@ static int init(void)
 
  // test_gpio_led();
   test_discovery_process();
-
-
- /* attempt to read temperature */
-//   sendInitializationSequence();
-//   writeROMCommand(SKIP_ROM);
-//   writeFunctionCommand(CONVERT_TEMP);
- //  Bit statusConversion;
- //  do
- //  {
- //    statusConversion = readBitFromBus();
- //  }while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
- //
-   //sendInitializationSequence();
-   //writeROMCommand(SKIP_ROM);
-   //writeFunctionCommand(READ_SCRATCHPAD);
-//   int i;
-// #define blah 9
-//   u8 result[blah] = {0};
-//   for ( i = 0; i < blah; i++ )
-//   {
-//     result[i] = readByteFromBus();
-//   }
-//     
-//   for ( i = 0; i < blah; i++ )
-//   {
-//     printk(KERN_INFO "%x", result[i]);
-//   }
- 
- deleteBitOperations();
+//  test_temperature_process();
 
  return(errorCode);
 }

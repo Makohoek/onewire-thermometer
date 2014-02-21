@@ -22,8 +22,8 @@ __attribute__((section("__versions"))) = {
 	{ 0xdbdb88d1, "cdev_del" },
 	{ 0x15692c87, "param_ops_int" },
 	{ 0x2e5810c6, "__aeabi_unwind_cpp_pr1" },
-	{ 0x47229b5c, "gpio_request" },
 	{ 0x432fd7f6, "__gpio_set_value" },
+	{ 0x403f9529, "gpio_request_one" },
 	{ 0xeae3dfd6, "__const_udelay" },
 	{ 0x7485e15e, "unregister_chrdev_region" },
 	{ 0x65d6d0f0, "gpio_direction_input" },
@@ -42,4 +42,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "A55BE7BB394BBC64B02C47A");
+MODULE_INFO(srcversion, "35303FC192631BA2EE3B753");
