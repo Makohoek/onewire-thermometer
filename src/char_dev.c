@@ -123,6 +123,7 @@ static void test_gpio_led(void)
 
 static void test_discovery_process(void)
 {
+  Bit sensorID[64] = {ZERO};
   /* displays GPIO port */
   logk((KERN_INFO "GpioPort=%d\n", GpioPort));
   int initValue = initializeBitOperations(GpioPort);
@@ -137,48 +138,39 @@ static void test_discovery_process(void)
   logk((KERN_INFO "Sending an initialization sequence...\n"));
   sendInitializationSequence();
   writeROMCommand(SEARCH_ROM);
-  performDiscovery();
+  performDiscovery(sensorID);
 }
 
-#if 0
+#if 1
 static void test_temperature_process(void)
 {
-  logk((KERN_INFO "GpioPort=%d\n", GpioPort));
-  int initValue = initializeBitOperations(GpioPort);
-  if (initValue == 0)
-  {
-    logk((KERN_INFO "Gpio initialized"));
-  }
-  else
-  {
-    logk((KERN_ALERT "ERROR while calling initializeGPIO"));
-  }
  /* attempt to read temperature */
   logk((KERN_INFO "Sending an initialization sequence...\n"));
    sendInitializationSequence();
    writeROMCommand(SKIP_ROM);
    writeFunctionCommand(CONVERT_TEMP);
-//  Bit statusConversion;
-//  do
-//  {
-//    statusConversion = readBitFromBus();
-//  }while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
-//
- sendInitializationSequence();
- writeROMCommand(SKIP_ROM);
- writeFunctionCommand(READ_SCRATCHPAD);
-   int i;
- #define blah 9
-   u8 result[blah] = {0};
-   for ( i = 0; i < blah; i++ )
-   {
-     result[i] = readByteFromBus();
-   }
-     
-   for ( i = 0; i < blah; i++ )
-   {
-     logk((KERN_INFO "%x", result[i]));
-   }
+  Bit statusConversion;
+  do
+  {
+    statusConversion = readBitFromBus();
+  }while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
+  logk((KERN_INFO "Done converting the temperature"));
+
+// sendInitializationSequence();
+// writeROMCommand(SKIP_ROM);
+// writeFunctionCommand(READ_SCRATCHPAD);
+//   int i;
+// #define blah 9
+//   u8 result[blah] = {0};
+//   for ( i = 0; i < blah; i++ )
+//   {
+//     result[i] = readByteFromBus();
+//   }
+//     
+//   for ( i = 0; i < blah; i++ )
+//   {
+//     logk((KERN_INFO "%x", result[i]));
+//   }
 }
 #endif
 
@@ -211,7 +203,7 @@ static int init(void)
 
 //  test_gpio_led();
   test_discovery_process();
-//  test_temperature_process();
+  test_temperature_process();
 
  return(errorCode);
 }

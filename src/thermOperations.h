@@ -25,7 +25,7 @@ typedef enum
 } ROMCommand;
 
 // check real hex values here
-typedef enum 
+typedef enum
 {
   ALARM_SEARCH = 0xEC, 
   CONVERT_TEMP = 0x44, 
@@ -35,9 +35,10 @@ typedef enum
   /* missing commands can be found in kernel/drivers/w1/w1.h */
 } FunctionCommand;
 
+typedef Bit SensorID[64];
 
 int readTemperature( void ); //TODO
-void performDiscovery( void );
+void performDiscovery( Bit discoveredSensorID[64] );
 void writeFunctionCommand(FunctionCommand command);
 void writeROMCommand(ROMCommand romcommand);
 
