@@ -20,6 +20,7 @@
 #include "bitOperations.h"
 #include "protocolOperations.h"
 #include "dmesgLogging.h"
+#include "led.h"
 
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 1;
@@ -94,32 +95,20 @@ static int release(struct inode *in, struct file *f)
   return errorCode;
 }
 
-#if 0
 static void test_gpio_led(void)
 {
   // turns on the gpio led to show something actually working
   int i;
-  int ledPin = 12;
-  int initValue = initializeBitOperations(ledPin);
-  if (initValue == 0)
-  {
-    logk((KERN_INFO "Gpio initialized"));
-  }
-  else
-  {
-    logk((KERN_ALERT "ERROR while calling initializeGPIO"));
-  }
+  initializeLed();
   logk((KERN_INFO "Blinking led 3 times\n"));
   for ( i = 0; i < 3; i++ )
   {
-    holdBus(ONE);
-    writeBitGpio(ONE);
+    turnLedOn();
     msleep(1000);
-    releaseBus();
+    turnLedOff();
     msleep(1000);
   }
 }
-#endif
 
 static void test_discovery_process(void)
 {
