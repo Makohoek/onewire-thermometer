@@ -41,14 +41,15 @@ int isBitIdONE(Bit bit, Bit complementaryBit)
  */
 void performDiscovery( void )
 {
-  logk((KERN_INFO "Performing discovery on the bus\n"));
   int i;
   Bit discoveredSensorID[64];
+  Bit responseBit, bit, complementaryBit;
+  logk((KERN_INFO "Performing discovery on the bus\n"));
   for ( i = 0; i < 64; i++ )
   {
-    Bit responseBit = ZERO;
-    Bit bit = readBitFromBus();
-    Bit complementaryBit = readBitFromBus();
+    responseBit = ZERO;
+    bit = readBitFromBus();
+    complementaryBit = readBitFromBus();
     if (isBitIdZERO(bit, complementaryBit))
     {
       responseBit = ZERO;
@@ -59,14 +60,14 @@ void performDiscovery( void )
     }
     else if (bit == ONE && complementaryBit == ONE)
     {
-      printk(KERN_ALERT "Discovery protocol (bit %d) is not respected!!\n", i);
+      printk(KERN_ALERT "Discovery protocol[bit %d]: ERROR: protocol is not respected!!\n", i);
       return;
     }
     else 
     {
       // we dont know. We have to select which one we want to keep
       // Arbitrary we want to keep the ONE :)
-      logk((KERN_INFO "Dont know"));
+      logk((KERN_INFO "Discovery protocol[bit %d]: don't know", i));
       responseBit = ONE;
     }
     // select which one can survive
@@ -74,8 +75,8 @@ void performDiscovery( void )
     udelay(2);
     discoveredSensorID[i] = responseBit;
   }
-  printk(KERN_INFO "End of discovery on the bus\n");
-  printk(KERN_INFO "Received this ID: ");
+  printk(KERN_INFO "Discovery protocol: ended\n");
+  printk(KERN_INFO "Discovery protocol: Received this ID: ");
   for ( i = 0; i < 64; i+=4 )
   {
     printk(KERN_INFO "%d %d %d %d", discoveredSensorID[i] == ZERO ? 0:1,
@@ -94,5 +95,3 @@ void writeROMCommand(ROMCommand romCommand)
 {
   writeByteToBus(romCommand);
 }
-
-
