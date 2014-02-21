@@ -48,9 +48,7 @@ void performDiscovery( void )
   {
     Bit responseBit = ZERO;
     Bit bit = readBitFromBus();
-    udelay(2);
     Bit complementaryBit = readBitFromBus();
-    udelay(2);
     if (isBitIdZERO(bit, complementaryBit))
     {
       responseBit = ZERO;
@@ -62,7 +60,6 @@ void performDiscovery( void )
     else if (bit == ONE && complementaryBit == ONE)
     {
       printk(KERN_ALERT "Discovery protocol (bit %d) is not respected!!\n", i);
-      responseBit = ZERO;
       return;
     }
     else 

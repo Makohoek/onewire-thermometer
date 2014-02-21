@@ -34,25 +34,22 @@ static void writeZeroToBus( void );
 
 int sendInitializationSequence( void )
 {
-  Bit result;
+  Bit result, result2;
   /* generate a reset pulse */
   if (holdBus(ZERO) != 0)
   {
     logk((KERN_ALERT "impossible to HOLD BUS\n"));
   }
+  writeBitGpio(ZERO);
   udelay(485);
   writeBitGpio(ONE);
-  if (releaseBus() != 0)
-  {
-    logk((KERN_ALERT "impossible to RELEASE BUS\n"));
-  }
+  releaseBus();
   udelay(60);
 
   /* read a presence pulse */
   result = readBitGpio();
-  int i;
   udelay(240);
-  Bit result2 = readBitGpio();
+  result2 = readBitGpio();
   if (result == ZERO && result2 == ONE) // detected a presence pulse
   {
     logk((KERN_INFO "Device is present and answered\n"));
@@ -105,31 +102,21 @@ void writeBitToBus( Bit bitToWrite )
 
 static void writeOneToBus( void )
 {
-  if (holdBus(ZERO) != 0)
-  {
-    logk((KERN_ALERT "impossible to HOLD BUS\n"));
-  }
+  holdBus(ZERO);
   writeBitGpio(ZERO);
   udelay(6);
-  if(releaseBus() != 0)
-  {
-    logk((KERN_ALERT "Impossible to RELEASE BUS"));
-  }
+  writeBitGpio(ONE);
+  releaseBus();
   udelay(64);
 }
 
 static void writeZeroToBus( void )
 {
-  if (holdBus(ZERO) != 0)
-  {
-    logk((KERN_ALERT "impossible to HOLD BUS\n"));
-  }
+  holdBus(ZERO);
   writeBitGpio(ZERO);
   udelay(60);
-  if(releaseBus() != 0)
-  {
-    logk((KERN_ALERT "Impossible to RELEASE BUS"));
-  }
+  writeBitGpio(ONE);
+  releaseBus();
   udelay(10);
 }
 
@@ -140,24 +127,17 @@ static void writeZeroToBus( void )
  */
 Bit readBitFromBus( void )
 {
-  Bit result = ONE;
   unsigned long flags;
+  Bit result = ONE;
   local_irq_save(flags); // disable interruptions here because of critical timing
-  if (holdBus(ZERO) != 0)
-  {
-    //logk((KERN_ALERT "impossible to HOLD BUS\n"));
-  }
+  holdBus(ZERO);
   writeBitGpio(ZERO);
   udelay(6);
-  if(releaseBus() != 0)
-  {
-    logk((KERN_ALERT "Impossible to RELEASE BUS"));
-  }
+  writeBitGpio(ONE);
+  releaseBus();
   udelay(9);
-  // data from the DS18B20 is valid 15us after falling edge
-  result = readBitGpio();
+  result = readBitGpio(); // data from the DS18B20 is valid 15us after falling edge
   local_irq_restore(flags);
   udelay(55);
-
   return result;
 }

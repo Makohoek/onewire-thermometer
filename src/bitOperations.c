@@ -19,11 +19,9 @@ int initializeBitOperations( int GpioPin )
   int errorOccured;
   // initialize the port we want to work on
   mGpioPin = GpioPin;
-  
   // request the gpio device
   //errorOccured = gpio_request(GpioPin, "Green test led"); // used when testing the Leds
   errorOccured = gpio_request_one(GpioPin, GPIOF_OPEN_DRAIN, "One-Wire Bus"); // used for w1 bus
-  
   if (errorOccured)
   {
     logk((KERN_ALERT "ERROR occured requesting the GPIO pin\n"));
@@ -44,20 +42,12 @@ int holdBus(Bit initialBit)
   int bit, errorOccured;
   bit = BitToInt(initialBit);
   errorOccured = gpio_direction_output(mGpioPin, initialBit);
-  if (errorOccured)
-  {
-    logk((KERN_ALERT "ERROR occured while attempting to hold the one wire bus\n"));
-  }
   return errorOccured;
 }
 
 int releaseBus( void )
 {
   int errorOccured = gpio_direction_input( mGpioPin );
-  if (errorOccured)
-  {
-    logk((KERN_ALERT "ERROR occured while releasing the one wire bus\n"));
-  }
   return errorOccured;
 }
 

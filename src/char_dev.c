@@ -94,6 +94,7 @@ static int release(struct inode *in, struct file *f)
   return errorCode;
 }
 
+#if 0
 static void test_gpio_led(void)
 {
   // turns on the gpio led to show something actually working
@@ -117,8 +118,8 @@ static void test_gpio_led(void)
     releaseBus();
     msleep(1000);
   }
- deleteBitOperations();
 }
+#endif
 
 static void test_discovery_process(void)
 {
@@ -137,10 +138,9 @@ static void test_discovery_process(void)
   sendInitializationSequence();
   writeROMCommand(SEARCH_ROM);
   performDiscovery();
-
-  deleteBitOperations();
 }
 
+#if 0
 static void test_temperature_process(void)
 {
   logk((KERN_INFO "GpioPort=%d\n", GpioPort));
@@ -179,9 +179,8 @@ static void test_temperature_process(void)
    {
      logk((KERN_INFO "%x", result[i]));
    }
-
- deleteBitOperations();
 }
+#endif
 
 static int init(void)
 {
@@ -220,7 +219,6 @@ static int init(void)
 
 static void cleanup(void)
 {
-  int errorCode = 0;
   deleteBitOperations();
   /* freeing memory and major,(s) */
   unregister_chrdev_region(dev,NB_OF_MINORS);
