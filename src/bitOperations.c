@@ -7,54 +7,62 @@
 static int mGpioPin = -1;
 
 /* methods */
-static void assertPinIsInitialized( void );
+static void assertPinIsValid( void );
 
-int initializeBitOperations( int GpioPin )
+static int outputGpio(Bit initialBit);
+static int inputGpio( void );
+static void writeGpio( Bit bitToWrite );
+static Bit readGpio( void );
+
+void pullBusLow( void )
 {
-  if (!gpio_is_valid(GpioPin))
-  {
-    logk((KERN_ALERT "ERROR: %d pin is not valid\n", GpioPin));
-    return -1;
-  }
-  int errorOccured;
-  // initialize the port we want to work on
-  mGpioPin = GpioPin;
-  // request the gpio device
-  //errorOccured = gpio_request(GpioPin, "Green test led"); // used when testing the Leds
-  errorOccured = gpio_request_one(GpioPin, GPIOF_OPEN_DRAIN, "One-Wire Bus"); // used for w1 bus
-  if (errorOccured)
-  {
-    logk((KERN_ALERT "ERROR occured requesting the GPIO pin\n"));
-  }
-  return (errorOccured);
+  outputGpio(ZERO);
+  writeGpio(ZERO);
 }
 
-void writeBitGpio( Bit bitToWrite )
+void releaseBus( void )
+{
+  inputGpio();
+}
+
+Bit readBus( void )
+{
+  return readGpio();
+}
+
+static void writeGpio( Bit bitToWrite )
 {
   int bit;
-  assertPinIsInitialized();
+  assertPinIsValid();
   bit = BitToInt(bitToWrite);
   gpio_set_value(mGpioPin, bit);
 }
 
-int holdBus(Bit initialBit)
+static int outputGpio(Bit initialBit) // takes an argument to avoid bit glitching
 {
   int bit, errorOccured;
+  assertPinIsValid();
   bit = BitToInt(initialBit);
   errorOccured = gpio_direction_output(mGpioPin, initialBit);
   return errorOccured;
 }
 
-int releaseBus( void )
+static int inputGpio( void )
 {
-  int errorOccured = gpio_direction_input( mGpioPin );
+  int errorOccured; 
+  assertPinIsValid();
+  errorOccured = gpio_direction_input( mGpioPin );
+  if (errorOccured)
+  {
+    logk((KERN_ALERT "Error when setting %d pin to input\n", mGpioPin));
+  }
   return errorOccured;
 }
 
-Bit readBitGpio( void )
+Bit readGpio( void )
 {
   int bit;
-  assertPinIsInitialized();
+  assertPinIsValid();
   bit = gpio_get_value( mGpioPin );
   return (intToBit(bit));
 }
@@ -69,15 +77,34 @@ Bit intToBit(int myInt)
   return (myInt == 0) ? ZERO : ONE;
 }
 
-static void assertPinIsInitialized( void )
+static void assertPinIsValid( void )
 {
-  if (mGpioPin == -1) 
+  if (mGpioPin == -1 || !gpio_is_valid(mGpioPin)) 
   {
-    logk((KERN_ERR "mGpioPin is not initialized: cannot operate on -1\n"));
+    logk((KERN_ALERT "ERROR: %d pin is not valid\n", mGpioPin));
   }
 }
 
-void deleteBitOperations( void )
+int initializeBus( int GpioPin )
+{
+  if (!gpio_is_valid(GpioPin))
+  {
+    logk((KERN_ALERT "ERROR: %d pin is not valid\n", mGpioPin));
+    return -1;
+  }
+  int errorOccured;
+  // initialize the port we want to work on
+  mGpioPin = GpioPin;
+  // request the gpio device
+  errorOccured = gpio_request_one(GpioPin, GPIOF_OPEN_DRAIN, "One-Wire Bus"); // used for w1 bus
+  if (errorOccured)
+  {
+    logk((KERN_ALERT "ERROR occured requesting the GPIO pin\n"));
+  }
+  return (errorOccured);
+}
+
+void deleteBus( void )
 {
   gpio_free(mGpioPin);
 }

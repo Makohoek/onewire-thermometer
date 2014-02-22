@@ -1,33 +1,33 @@
-/*
- * Handles the different timings
+/**
+ * Handles the different one-wire timings
  * in order to communicate properly with the
  * Maxim DS18B2
  * 
  * Mattijs Korpershoek
  * <mattijs.korpershoek@gmail.com>
+ * Alexandre Montilla
+ * <alexandre.montilla@gmail.com>
  */
-#include "protocolOperations.h"
+#include "OneWire.h"
 
 static unsigned long interruptFlags;
+static void OneWireWriteOneSlot( void );
+static void OneWireWriteZeroSlot( void );
 static void disableInterruptions(void);
 static void enableInterruptions(void);
-
-static void writeOneToBus( void );
-static void writeZeroToBus( void );
 
 int sendInitializationSequence( void )
 {
   Bit presencePulse, inactiveBus;
   /* generate a reset pulse */
-  holdBus(ZERO); 
-  writeBitGpio(ZERO);
+  pullBusLow();
   udelay(485);
   releaseBus();
   udelay(60);
   /* read a presence pulse */
-  presencePulse = readBitGpio();
+  presencePulse = readBus();
   udelay(240);
-  inactiveBus = readBitGpio();
+  inactiveBus = readBus();
   if (presencePulse == ZERO && inactiveBus == ONE) // detected a presence pulse
   {
     logk((KERN_INFO "Device is present and answered\n"));
@@ -40,83 +40,79 @@ int sendInitializationSequence( void )
   return presencePulse;
 }
 
-void writeByteToBus(u8 byteToWrite)
+void OneWireWriteByte(u8 byteToWrite)
 {
   int i;
   for ( i = 0; i < 8; i++ )
   {
     Bit bitToWrite = intToBit((byteToWrite >> i) & 0x1);
-    writeBitToBus(bitToWrite);
+    OneWireWriteBit(bitToWrite);
     logk((KERN_INFO "send %d to bus\n", BitToInt(bitToWrite)));
     udelay(2);
   }
 }
 
-u8 readByteFromBus( void )
+u8 OneWireReadByte( void )
 {
   int i;
   Bit readedBit;
   u8 result = 0;
   for ( i = 0; i < 8; i++ )
   {
-    readedBit = readBitFromBus();
+    readedBit = OneWireReadBit();
     result |= BitToInt(readedBit) << i;
     udelay(2);
   }
   return (result);
 }
 
-static void writeOneToBus( void )
+static void OneWireWriteOneSlot( void )
 {
   disableInterruptions();
-  holdBus(ZERO);
-  writeBitGpio(ZERO);
+  pullBusLow();
   udelay(6);
   releaseBus();
   udelay(64);
   enableInterruptions();
 }
 
-static void writeZeroToBus( void )
+static void OneWireWriteZeroSlot( void )
 {
   disableInterruptions();
-  holdBus(ZERO);
-  writeBitGpio(ZERO);
+  pullBusLow();
   udelay(60);
   releaseBus();
   udelay(10);
   enableInterruptions();
 }
 
-
 /**
  * Note: MUST be called after
  * a Read Command such as read scratchpad, for example
  */
-Bit readBitFromBus( void )
+Bit OneWireReadBit( void )
 {
   Bit result;
   disableInterruptions();
-  holdBus(ZERO);
-  writeBitGpio(ZERO);
+  pullBusLow();
   udelay(6);
   releaseBus();
   udelay(9);
-  result = readBitGpio();
+  result = readBus();
   udelay(55);
   enableInterruptions();
   return result;
 }
 
-void writeBitToBus( Bit bitToWrite )
+void OneWireWriteBit( Bit bitToWrite )
 {
   if ( bitToWrite == ONE )
   {
-    writeOneToBus();
+    OneWireWriteOneSlot();
   }
   else
   {
-    writeZeroToBus();
+    OneWireWriteZeroSlot();
   }
 }
 

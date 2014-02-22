@@ -17,8 +17,10 @@
 #include <linux/delay.h>
 
 #include "thermOperations.h"
+#include "DiscoveryProtocol.h"
+#include "GlobalData.h"
 #include "bitOperations.h"
-#include "protocolOperations.h"
+#include "OneWire.h"
 #include "dmesgLogging.h"
 #include "led.h"
 
@@ -112,11 +114,10 @@ static void test_gpio_led(void)
 
 static void test_discovery_process(void)
 {
-  Bit sensorID[64] = {ZERO};
+  SensorID discoveredID = {ZERO};
   /* displays GPIO port */
   logk((KERN_INFO "GpioPort=%d\n", GpioPort));
-  int initValue = initializeBitOperations(GpioPort);
-  if (initValue == 0)
+  if (initializeBus(GpioPort))
   {
     logk((KERN_INFO "Gpio initialized"));
   }
@@ -127,39 +128,36 @@ static void test_discovery_process(void)
   logk((KERN_INFO "Sending an initialization sequence...\n"));
   sendInitializationSequence();
   writeROMCommand(SEARCH_ROM);
-  performDiscovery(sensorID);
+  performDiscovery(discoveredID);
 }
 
 #if 1
 static void test_temperature_process(void)
 {
- /* attempt to read temperature */
+  SensorID mSensorID  = {ZERO};
+  /* attempt to read temperature */
   logk((KERN_INFO "Sending an initialization sequence...\n"));
-   sendInitializationSequence();
-   writeROMCommand(SKIP_ROM);
-   writeFunctionCommand(CONVERT_TEMP);
-  Bit statusConversion;
-  do
-  {
-    statusConversion = readBitFromBus();
-  }while(statusConversion != ONE); //waiting for the temperature to be fully converted to the scratchpad
-  logk((KERN_INFO "Done converting the temperature"));
+  sendInitializationSequence();
+  writeROMCommand(SKIP_ROM);
+  writeFunctionCommand(CONVERT_TEMP);
+  waitForConversionDone();
 
-// sendInitializationSequence();
-// writeROMCommand(SKIP_ROM);
-// writeFunctionCommand(READ_SCRATCHPAD);
-//   int i;
-// #define blah 9
-//   u8 result[blah] = {0};
-//   for ( i = 0; i < blah; i++ )
-//   {
-//     result[i] = readByteFromBus();
-//   }
-//     
-//   for ( i = 0; i < blah; i++ )
-//   {
-//     logk((KERN_INFO "%x", result[i]));
-//   }
+  sendInitializationSequence();
+  writeROMCommand(MATCH_ROM);
+  writeSensorID(mSensorID);
+  writeFunctionCommand(READ_SCRATCHPAD);
+  //   int i;
+  // #define blah 9
+  //   u8 result[blah] = {0};
+  //   for ( i = 0; i < blah; i++ )
+  //   {
+  //     result[i] = readByteFromBus();
+  //   }
+  //     
+  //   for ( i = 0; i < blah; i++ )
+  //   {
+  //     logk((KERN_INFO "%x", result[i]));
+  //   }
 }
 #endif
 
@@ -200,7 +198,7 @@ static int init(void)
 
 static void cleanup(void)
 {
-  deleteBitOperations();
+  deleteBus();
   /* freeing memory and major,(s) */
   unregister_chrdev_region(dev,NB_OF_MINORS);
   cdev_del(myDevice);

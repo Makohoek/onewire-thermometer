@@ -16,21 +16,14 @@
 
 #include <linux/gpio.h>
 #include "dmesgLogging.h"
+#include "GlobalData.h"
 
-typedef enum 
-{
-  ZERO = 0,
-  ONE = 1
-} Bit;
+int initializeBus( int GpioPin );
+void deleteBus( void );
 
-int initializeBitOperations( int GpioPin );
-void deleteBitOperations( void );
-
-int releaseBus( void );
-int holdBus(Bit initialBit);
-
-void writeBitGpio( Bit bitToWrite );
-Bit readBitGpio( void );
+void pullBusLow( void );
+void releaseBus( void );
+Bit readBus( void );
 
 int BitToInt(Bit myBit);
 Bit intToBit(int myInt);
