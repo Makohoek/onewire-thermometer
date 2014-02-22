@@ -17,6 +17,10 @@
 #include "dmesgLogging.h"
 #include "GlobalData.h"
 
+// max time to convert temperature from the sensor.
+// refer to Table-2 from documentation
+#define TCONV 750
+
 void readTemperature( u8 readedScratchpad[9] );
 void writeFunctionCommand(FunctionCommand command);
 void writeROMCommand(ROMCommand romcommand);

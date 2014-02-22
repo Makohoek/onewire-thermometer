@@ -25,7 +25,8 @@
 #include "led.h"
 
 /* minor aliases */
-static const unsigned char NB_OF_MINORS = 1;
+static const unsigned char NB_OF_MINORS = 2;
+static const unsigned char LED = 0;
 
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
@@ -82,11 +83,15 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   return 0;
 }
 
+static void test_gpio_led(void);
 static int open(struct inode *in, struct file *f)
 {
   int errorCode = 0;
-
   logk((KERN_INFO "Pid(%d) Open with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
+  if (MINOR(in->i_rdev) == LED)
+  {
+    test_gpio_led();
+  }
 
   return errorCode;
 }
@@ -94,25 +99,9 @@ static int open(struct inode *in, struct file *f)
 static int release(struct inode *in, struct file *f)
 {
   int errorCode = 0;
-
   logk((KERN_INFO "Pid(%d) Release with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
 
   return errorCode;
-}
-
-static void test_gpio_led(void)
-{
-  // turns on the gpio led to show something actually working
-  int i;
-  initializeLed();
-  logk((KERN_INFO "Blinking led 3 times\n"));
-  for ( i = 0; i < 3; i++ )
-  {
-    turnLedOn();
-    msleep(1000);
-    turnLedOff();
-    msleep(1000);
-  }
 }
 
 static void test_discovery_process(void)
@@ -164,9 +153,27 @@ static void test_temperature_process(void)
 }
 #endif
 
+static void test_gpio_led(void)
+{
+  // turns on the gpio led to show something actually working
+  int i;
+  initializeLed();
+  logk((KERN_INFO "Blinking led 3 times\n"));
+  for ( i = 0; i < 3; i++ )
+  {
+    turnLedOn();
+    msleep(1000);
+    turnLedOff();
+    msleep(1000);
+  }
+}
+
 static int init(void)
 {
   int errorCode = 0;
+
+  // trouver le nombre de capteurs.
+  //
 
   /* dynamic allocation for major/minors */
   if (alloc_chrdev_region(&dev, 0, NB_OF_MINORS, "sample") == -1)

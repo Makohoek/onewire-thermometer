@@ -35,7 +35,7 @@ void writeROMCommand(ROMCommand romCommand)
 
 void waitForConversionDone(void)
 {
-  mdelay(600);
+  mdelay(TCONV);
   Bit statusConversion;
   int maxAttempts = 255;
   do
