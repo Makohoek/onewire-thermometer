@@ -51,6 +51,9 @@ static struct file_operations fileOperations =
   .release = release
 };
 
+/* the sensor id */
+SensorID discoveredID = {ZERO};
+
 /* dev_t contains major and minor version */
 dev_t dev;
 
@@ -114,7 +117,6 @@ static void test_gpio_led(void)
 
 static void test_discovery_process(void)
 {
-  SensorID discoveredID = {ZERO};
   /* displays GPIO port */
   logk((KERN_INFO "GpioPort=%d\n", GpioPort));
   if (initializeBus(GpioPort))
@@ -131,10 +133,19 @@ static void test_discovery_process(void)
   performDiscovery(discoveredID);
 }
 
+/* based on memory map manual page 7 */
+/* from w1_therm.c */
+static inline int convertToCelsius(u8 rom[9])
+{
+  s16 t = le16_to_cpup((__le16 *)rom);
+  return t*1000/16;
+}
+
 #if 1
 static void test_temperature_process(void)
 {
-  SensorID mSensorID  = {ZERO};
+  u8 readedValues[9];
+  int temperature = 0;
   /* attempt to read temperature */
   logk((KERN_INFO "Sending an initialization sequence...\n"));
   sendInitializationSequence();
@@ -144,20 +155,12 @@ static void test_temperature_process(void)
 
   sendInitializationSequence();
   writeROMCommand(MATCH_ROM);
-  writeSensorID(mSensorID);
+  writeSensorID(discoveredID);
   writeFunctionCommand(READ_SCRATCHPAD);
-  //   int i;
-  // #define blah 9
-  //   u8 result[blah] = {0};
-  //   for ( i = 0; i < blah; i++ )
-  //   {
-  //     result[i] = readByteFromBus();
-  //   }
-  //     
-  //   for ( i = 0; i < blah; i++ )
-  //   {
-  //     logk((KERN_INFO "%x", result[i]));
-  //   }
+  readTemperature(readedValues);
+  temperature = convertToCelsius(readedValues);
+
+  logk((KERN_INFO "Readed temperature: %d", temperature));
 }
 #endif
 

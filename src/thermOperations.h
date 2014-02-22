@@ -17,7 +17,7 @@
 #include "dmesgLogging.h"
 #include "GlobalData.h"
 
-float readTemperature( SensorID sensorID );
+void readTemperature( u8 readedScratchpad[9] );
 void writeFunctionCommand(FunctionCommand command);
 void writeROMCommand(ROMCommand romcommand);
 void waitForConversionDone(void);
