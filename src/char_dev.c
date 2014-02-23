@@ -59,7 +59,7 @@ static struct file_operations fileOperations =
 SensorID discoveredID = {ZERO};
 
 /* the current resolution for our sensor */
-unsigned char mResolution = 12;
+TemperatureResolution mResolution = 12;
 
 /* dev_t contains major and minor version */
 dev_t dev;
@@ -91,7 +91,7 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
 
 static ssize_t read_led(struct file *f, char *buf, size_t size, loff_t *offset)
 {
-  setNewResolution(9);
+  setNewResolution(MINIMUM);
   blinkGpioLed();
   return 0;
 }

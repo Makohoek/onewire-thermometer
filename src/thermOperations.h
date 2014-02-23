@@ -24,8 +24,14 @@
 
 #define MAX_CHARS_TEMPERATURE 14 // max precision = 12, one char for '.' and one for '\0'
 typedef char TemperatureString[MAX_CHARS_TEMPERATURE];
-
 typedef u8 Scratchpad[9];
+typedef enum
+{
+  MAXIMUM=12,
+  HIGH=11,
+  LOW=10,
+  MINIMUM=9
+} TemperatureResolution;
 
 void readScratchpad(Scratchpad readedScratchpad);
 void writeScratchpad(Scratchpad scratchpad);
@@ -33,8 +39,8 @@ void writeFunctionCommand(FunctionCommand command);
 void writeROMCommand(ROMCommand romcommand);
 void waitForConversionDone(void);
 void writeSensorID(SensorID sensorID);
-long extractTemperatureFromScratchpad(Scratchpad scratchpadData, int resolution);
+long extractTemperatureFromScratchpad(Scratchpad scratchpadData, TemperatureResolution resolution);
 int temperatureToString(TemperatureString result, long temperature);
-void buildScratchpadNewResolution(Scratchpad scratchpad, int howManyBits);
+void buildScratchpadNewResolution(Scratchpad scratchpad, TemperatureResolution resolution);
 
 #endif /* end of include guard: __INC_THERMOPERATIONS__ */

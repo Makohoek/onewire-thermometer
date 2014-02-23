@@ -9,8 +9,8 @@
 #include "thermOperations.h"
 
 #define CONFIGURATION_BYTE 4
-static u8 getConfigurationByteFromResolution(int resolution);
-static s16 adjustTemperatureOnResolution(s16 temperature, int resolution);
+static u8 getConfigurationByteFromResolution(TemperatureResolution resolution);
+static s16 adjustTemperatureOnResolution(s16 temperature, TemperatureResolution resolution);
 
 /**
  * Read the scratchpad data after a READ_SCRATCHPAD function command
@@ -48,21 +48,21 @@ void writeScratchpad(Scratchpad scratchpad)
 /**
  * creates a new scratchpad data which can be send after a WRITE_SCRATCHPAD command
  */
-void buildScratchpadNewResolution(Scratchpad scratchpad, int howManyBits)
+void buildScratchpadNewResolution(Scratchpad scratchpad, TemperatureResolution resolution)
 {
   u8 configurationByte = 0x7f;
-  if (howManyBits > 12 || howManyBits < 9)
+  if (resolution > 12 || resolution < 9)
   {
-    logk((KERN_ALERT "Attempting to set a bad temperature resolution(%d)", howManyBits));
+    logk((KERN_ALERT "Attempting to set a bad temperature resolution(%d)", resolution));
     return;
   }
-  configurationByte = getConfigurationByteFromResolution(howManyBits);
+  configurationByte = getConfigurationByteFromResolution(resolution);
   scratchpad[CONFIGURATION_BYTE] = configurationByte;
 }
 
 /* based on memory map manual page 7 */
 /* from w1_therm.c */
-long extractTemperatureFromScratchpad(Scratchpad scratchpadData, int resolution)
+long extractTemperatureFromScratchpad(Scratchpad scratchpadData, TemperatureResolution resolution)
 {
   s16 temperature = le16_to_cpup((__le16 *)scratchpadData);
   temperature = adjustTemperatureOnResolution(temperature, resolution);
@@ -108,18 +108,18 @@ void waitForConversionDone(void)
  * Use a bit mask to clear out the unknown bits
  * according to manual page 3, bits are if not at max precision
  * */
-static s16 adjustTemperatureOnResolution(s16 temperature, int resolution)
+static s16 adjustTemperatureOnResolution(s16 temperature, TemperatureResolution resolution)
 {
   s16 mask = 0xffff;
-  if (resolution == 11)
+  if (resolution == HIGH)
   {
     mask = 0xfffe;
   }
-  if (resolution == 10)
+  if (resolution == LOW)
   {
     mask = 0xfffd;
   }
-  if (resolution == 9)
+  if (resolution == MINIMUM)
   {
     mask = 0xfffc;
   }
@@ -128,21 +128,21 @@ static s16 adjustTemperatureOnResolution(s16 temperature, int resolution)
 }
 
 /* use the configuration register described in the manual page 8 */
-static u8 getConfigurationByteFromResolution(int resolution)
+static u8 getConfigurationByteFromResolution(TemperatureResolution resolution)
 {
-  if (resolution == 12)
+  if (resolution == MAXIMUM)
   {
     return 0b01111111;
   }
-  if (resolution == 11)
+  if (resolution == HIGH)
   {
     return 0b01011111;
   }
-  if (resolution == 10)
+  if (resolution == LOW)
   {
     return 0b00111111;
   }
-  if (resolution == 9)
+  if (resolution == MINIMUM)
   {
     return 0b00011111;
   }
