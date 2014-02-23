@@ -8,6 +8,10 @@
  */
 #include "thermOperations.h"
 
+#define CONFIGURATION_BYTE 4
+static u8 getConfigurationByteFromResolution(int resolution);
+static s16 adjustTemperatureOnResolution(s16 temperature, int resolution);
+
 /**
  * Read the scratchpad data after a READ_SCRATCHPAD function command
  */
@@ -41,8 +45,6 @@ void writeScratchpad(Scratchpad scratchpad)
   }
 }
 
-static u8 getConfigurationByteFromResolution(int resolution);
-#define CONFIGURATION_BYTE 4
 /**
  * creates a new scratchpad data which can be send after a WRITE_SCRATCHPAD command
  */
@@ -58,33 +60,12 @@ void buildScratchpadNewResolution(Scratchpad scratchpad, int howManyBits)
   scratchpad[CONFIGURATION_BYTE] = configurationByte;
 }
 
-/* use the configuration register described in the manual page 8 */
-static u8 getConfigurationByteFromResolution(int resolution)
-{
-  if (resolution == 12)
-  {
-    return 0b01111111;
-  }
-  if (resolution == 11)
-  {
-    return 0b01011111;
-  }
-  if (resolution == 10)
-  {
-    return 0b00111111;
-  }
-  if (resolution == 9)
-  {
-    return 0b00011111;
-  }
-  return 0b01111111; // return default configuration if false resolution is given
-}
-
 /* based on memory map manual page 7 */
 /* from w1_therm.c */
-long extractTemperatureFromScratchpad(Scratchpad scratchpadData)
+long extractTemperatureFromScratchpad(Scratchpad scratchpadData, int resolution)
 {
   s16 temperature = le16_to_cpup((__le16 *)scratchpadData);
+  temperature = adjustTemperatureOnResolution(temperature, resolution);
   return temperature*1000/16;
 }
 
@@ -121,5 +102,50 @@ void waitForConversionDone(void)
     logk((KERN_ALERT "ERROR: Sensor did not finished conversion in %d attempts!", maxAttempts));
   }
   logk((KERN_INFO "Done converting the temperature"));
+}
+
+/**
+ * Use a bit mask to clear out the unknown bits
+ * according to manual page 3, bits are if not at max precision
+ * */
+static s16 adjustTemperatureOnResolution(s16 temperature, int resolution)
+{
+  s16 mask = 0xffff;
+  if (resolution == 11)
+  {
+    mask = 0xfffe;
+  }
+  if (resolution == 10)
+  {
+    mask = 0xfffd;
+  }
+  if (resolution == 9)
+  {
+    mask = 0xfffc;
+  }
+  temperature &= mask;
+  return temperature;
+}
+
+/* use the configuration register described in the manual page 8 */
+static u8 getConfigurationByteFromResolution(int resolution)
+{
+  if (resolution == 12)
+  {
+    return 0b01111111;
+  }
+  if (resolution == 11)
+  {
+    return 0b01011111;
+  }
+  if (resolution == 10)
+  {
+    return 0b00111111;
+  }
+  if (resolution == 9)
+  {
+    return 0b00011111;
+  }
+  return 0b01111111; // return default configuration if false resolution is given
 }
 

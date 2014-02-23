@@ -33,7 +33,7 @@ void writeFunctionCommand(FunctionCommand command);
 void writeROMCommand(ROMCommand romcommand);
 void waitForConversionDone(void);
 void writeSensorID(SensorID sensorID);
-long extractTemperatureFromScratchpad(Scratchpad scratchpadData);
+long extractTemperatureFromScratchpad(Scratchpad scratchpadData, int resolution);
 int temperatureToString(TemperatureString result, long temperature);
 void buildScratchpadNewResolution(Scratchpad scratchpad, int howManyBits);
 
