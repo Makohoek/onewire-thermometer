@@ -69,6 +69,8 @@ static void blinkGpioLed(void);
 /* read temperature from the sensor */
 static int test_temperature_process(void);
 
+static void setNewResolution(void);
+
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
 {
   int temperature = 0;
@@ -154,6 +156,11 @@ static int test_temperature_process(void)
   temperature = extractTemperatureFromScratchpad(scratchpadData);
   logk((KERN_INFO "Readed temperature: %ld", temperature));
   return temperature;
+}
+
+static void setNewResolution(void)
+{
+  //TODO
 }
 
 static void blinkGpioLed(void)

@@ -28,11 +28,13 @@ typedef char TemperatureString[MAX_CHARS_TEMPERATURE];
 typedef u8 Scratchpad[9];
 
 void readScratchpad(Scratchpad readedScratchpad);
+void writeScratchpad(Scratchpad scratchpad);
 void writeFunctionCommand(FunctionCommand command);
 void writeROMCommand(ROMCommand romcommand);
 void waitForConversionDone(void);
 void writeSensorID(SensorID sensorID);
 long extractTemperatureFromScratchpad(Scratchpad scratchpadData);
 int temperatureToString(TemperatureString result, long temperature);
+void buildScratchpadNewResolution(Scratchpad scratchpad, int howManyBits);
 
 #endif /* end of include guard: __INC_THERMOPERATIONS__ */
