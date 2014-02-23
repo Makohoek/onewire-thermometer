@@ -23,8 +23,7 @@
 #include "OneWire.h"
 #include "dmesgLogging.h"
 #include "led.h"
-
-//TODO: move sensorID to his own file
+#include "SensorID.h"
 
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 2;

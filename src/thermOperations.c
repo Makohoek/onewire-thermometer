@@ -8,8 +8,9 @@
  */
 #include "thermOperations.h"
 
-static u8 getByte(SensorID sensorID, int whichByte);
-
+/**
+ * Read the scratchpad data after a READ_SCRATCHPAD function command
+ */
 void readScratchpad(Scratchpad readedScratchpad)
 {
   int i;
@@ -19,8 +20,40 @@ void readScratchpad(Scratchpad readedScratchpad)
   }
   for ( i = 0; i < 9; i++ )
   {
-    logk((KERN_INFO "%2x", readedScratchpad[i]));
+    logk((KERN_INFO "readScratchpad(%d): received %2x", i, readedScratchpad[i]));
   }
+}
+
+/**
+ * Write the scratchpad data after a WRITE_SCRATCHPAD function command
+ * */
+void writeScratchpad(Scratchpad scratchpad)
+{
+  int i;
+  for ( i = 0; i < 9; i++ )
+  {
+    OneWireWriteByte(scratchpad[i]);
+  }
+  for ( i = 0; i < 9; i++ )
+  {
+    logk((KERN_INFO "writeScratchpad(%d): send %2x",i , scratchpad[i]));
+  }
+}
+
+/* use the configuration register described in the manual page 8 */
+void setNewResolution(int howManyBits)
+{
+  u8 configurationByte;
+  if (howManyBits > 12 || howManyBits < 9)
+  {
+    logk((KERN_ALERT "Attempting to set a bad temperature resolution(%d)", howManyBits));
+    return;
+  }
+  if (howManyBits == 12)
+  {
+    //TODO
+  }
+
 }
 
 /* based on memory map manual page 7 */
@@ -52,7 +85,7 @@ void waitForConversionDone(void)
   Bit statusConversion;
   const int maxAttempts = 100;
   int attempts = 0;
-  mdelay(TCONV/8); // wait for the minimum precision at least. (93.75ms when resolution = 9)
+  mdelay(TCONV/8/2); // wait for the half of the minimum precision at least. (93.75/2 ms when resolution = 9)
   do
   {
     logk((KERN_INFO "Waiting for conversion... (attempt %3d/%3d)", attempts, maxAttempts));
@@ -66,36 +99,3 @@ void waitForConversionDone(void)
   logk((KERN_INFO "Done converting the temperature"));
 }
 
-/**
- * Transfers the sensor ID on the one wire bus
- */
-void writeSensorID(SensorID sensorID)
-{
-  int i;
-  const int numberOfBytes = 64/8; // 64 bits, we send 8 bytes to transfer whole sensor id
-  u8 byteToSend;
-  for ( i = 0; i < numberOfBytes; i++ )
-  {
-    byteToSend = getByte(sensorID, i);
-    OneWireWriteByte(byteToSend);
-  }
-}
-
-/**
- * Get one of the bytes from the sensorID
- */
-static u8 getByte(SensorID sensorID, int whichByte)
-{
-  int i, shift, startIndex, endIndex;
-  u8 res = 0;
-  shift = 7;
-  startIndex = (whichByte+1)*8-1;
-  endIndex = 8*whichByte;
-  logk((KERN_INFO "getByte(%d): looping from %d -> %d", whichByte, startIndex, endIndex));
-  for (i = startIndex; i >= endIndex ; i--)
-  {
-    logk((KERN_INFO "Sensor(%d): %d", i, sensorID[i]));
-    res |= (sensorID[i] << (shift--));
-  }
-  return res;
-}

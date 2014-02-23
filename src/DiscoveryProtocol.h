@@ -4,8 +4,8 @@
 #include "OneWire.h"
 #include "dmesgLogging.h"
 #include "GlobalData.h"
+#include "SensorID.h"
 
 void performDiscovery( SensorID discoveredSensorID );
-void printSensorID( SensorID sensorID );
 
 #endif /* end of include guard: __INC_DISCOVERYPROTOCOL__ */

@@ -14,6 +14,7 @@
 #include <linux/kernel.h>
 
 #include "OneWire.h"
+#include "SensorID.h"
 #include "dmesgLogging.h"
 #include "GlobalData.h"
 
