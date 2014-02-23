@@ -80,7 +80,7 @@ static u8 getByte(SensorID sensorID, int whichByte)
   logk((KERN_INFO "getByte(%d): looping from %d -> %d", whichByte, startIndex, endIndex));
   for (i = startIndex; i >= endIndex ; i--)
   {
-    logk((KERN_INFO "Sensor(%d): %d %d", i, sensorID[i]));
+    logk((KERN_INFO "Sensor(%d): %d", i, sensorID[i]));
     res |= (sensorID[i] << (shift--));
   }
   return res;

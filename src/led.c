@@ -41,13 +41,11 @@ int initializeLed( void )
   if (!gpio_is_valid(mLedPin))
   {
     logk((KERN_ALERT "[Led]: ERROR %d pin is not valid\n", mLedPin));
-    return -1;
   }
   errorOccured = gpio_request(mLedPin, "Green led");
   if (errorOccured)
   {
     logk((KERN_ALERT "[Led]: ERROR occured requesting the pin(%d)\n", mLedPin));
-    return errorOccured;
   }
   isInitialized = 1;
   return 0;

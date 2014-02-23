@@ -35,6 +35,7 @@ static int GpioPort = 2;
 
 /* Standard character device operations */
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset);
+static ssize_t read_led(struct file *f, char *buf, size_t size, loff_t *offset);
 static int open(struct inode *in, struct file *f);
 static int release(struct inode *in, struct file *f);
 
@@ -61,10 +62,12 @@ dev_t dev;
 /* struct cdev == a Character Device*/
 struct cdev *myDevice;
 
+/* led blinking for fun-only part */
+static void blinkGpioLed(void);
+
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
 {
   logk((KERN_INFO "Read called!\n"));
-
   //   sizeToRead = MIN(myLinkedList->bufferSize - myLinkedList->beginReadIndex, size); // this condition is not valid for a non destructive read
   //
   //      logk((KERN_INFO "BeginReadIndex: %ld from file\n", myLinkedList->beginReadIndex);
@@ -83,16 +86,20 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   return 0;
 }
 
-static void test_gpio_led(void);
+static ssize_t read_led(struct file *f, char *buf, size_t size, loff_t *offset)
+{
+  blinkGpioLed();
+  return 0;
+}
+
 static int open(struct inode *in, struct file *f)
 {
   int errorCode = 0;
-  logk((KERN_INFO "Pid(%d) Open with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
   if (MINOR(in->i_rdev) == LED)
   {
-   // test_gpio_led();
+    fileOperations.read = read_led;
   }
-
+  logk((KERN_INFO "Pid(%d) Open with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
   return errorCode;
 }
 
@@ -130,7 +137,6 @@ static inline int convertToCelsius(u8 rom[9])
   return temperature*1000/16;
 }
 
-#if 1
 static void test_temperature_process(void)
 {
   u8 readedValues[9];
@@ -157,11 +163,9 @@ static void test_temperature_process(void)
 
   logk((KERN_INFO "Readed temperature: %d", temperature));
 }
-#endif
 
-static void test_gpio_led(void)
+static void blinkGpioLed(void)
 {
-  // turns on the gpio led to show something actually working
   int i;
   initializeLed();
   logk((KERN_INFO "Blinking led 3 times\n"));
@@ -172,6 +176,7 @@ static void test_gpio_led(void)
     turnLedOff();
     msleep(1000);
   }
+  freeLed();
 }
 
 static int init(void)
@@ -179,7 +184,7 @@ static int init(void)
   int errorCode = 0;
 
   // trouver le nombre de capteurs.
-  //
+  // TODO
 
   /* dynamic allocation for major/minors */
   if (alloc_chrdev_region(&dev, 0, NB_OF_MINORS, "sample") == -1)
@@ -202,8 +207,6 @@ static int init(void)
     logk((KERN_ALERT ">>> ERROR cdev_add\n"));
     return -EINVAL;
   }
-
-//  test_gpio_led(); // should not be called when playing with 1wire bus
   test_discovery_process();
   test_temperature_process();
 

@@ -49,7 +49,7 @@ static int outputGpio(Bit initialBit) // takes an argument to avoid bit glitchin
 
 static int inputGpio( void )
 {
-  int errorOccured; 
+  int errorOccured;
   assertPinIsValid();
   errorOccured = gpio_direction_input( mGpioPin );
   if (errorOccured)
@@ -79,7 +79,7 @@ Bit intToBit(int myInt)
 
 static void assertPinIsValid( void )
 {
-  if (mGpioPin == -1 || !gpio_is_valid(mGpioPin)) 
+  if (mGpioPin == -1 || !gpio_is_valid(mGpioPin))
   {
     logk((KERN_ALERT "ERROR: %d pin is not valid\n", mGpioPin));
   }
