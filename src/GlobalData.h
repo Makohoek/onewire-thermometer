@@ -25,5 +25,4 @@ typedef enum
 
 typedef Bit SensorID[64];
 
-
 #endif /* end of include guard: __INC_GLOBALDATA__ */

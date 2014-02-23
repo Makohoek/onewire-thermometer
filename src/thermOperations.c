@@ -10,7 +10,7 @@
 
 static u8 getByte(SensorID sensorID, int whichByte);
 
-void readTemperature( u8 readedScratchpad[9] )
+void readScratchpad(Scratchpad readedScratchpad)
 {
   int i;
   for ( i = 0; i < 9; i++ )
@@ -21,6 +21,20 @@ void readTemperature( u8 readedScratchpad[9] )
   {
     logk((KERN_INFO "%2x", readedScratchpad[i]));
   }
+}
+
+/* based on memory map manual page 7 */
+/* from w1_therm.c */
+long extractTemperatureFromScratchpad(Scratchpad scratchpadData)
+{
+  s16 temperature = le16_to_cpup((__le16 *)scratchpadData);
+  return temperature*1000/16;
+}
+
+int temperatureToString(TemperatureString result, long temperature)
+{
+  sprintf(result, "%ld.%ld", temperature/1000, temperature%1000);
+  return (strlen(result)+1) * sizeof(char); //+1 for also copying the and the \0'
 }
 
 void writeFunctionCommand(FunctionCommand functionCommand)

@@ -24,9 +24,12 @@
 #include "dmesgLogging.h"
 #include "led.h"
 
+//TODO: move sensorID to his own file
+
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 2;
 static const unsigned char LED = 0;
+static const unsigned char SENSOR = 1;
 
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
@@ -64,26 +67,22 @@ struct cdev *myDevice;
 
 /* led blinking for fun-only part */
 static void blinkGpioLed(void);
+/* read temperature from the sensor */
+static int test_temperature_process(void);
 
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
 {
+  int temperature = 0;
+  int sizeNotCopiedToUser = 0;
+  int sizeCopiedToUser = 0;
+  int nbCharsTemperatureString = 0;
+  TemperatureString temperatureString;
   logk((KERN_INFO "Read called!\n"));
-  //   sizeToRead = MIN(myLinkedList->bufferSize - myLinkedList->beginReadIndex, size); // this condition is not valid for a non destructive read
-  //
-  //      logk((KERN_INFO "BeginReadIndex: %ld from file\n", myLinkedList->beginReadIndex);
-  //      logk((KERN_INFO "Have to read %d from file\n", sizeToRead);
-  //
-  //   myBuffer = (char*)kmalloc(sizeof(char)*sizeToRead, GFP_KERNEL);
-  //
-  //   myLinkedList->readFromLinkedList(myLinkedList, myBuffer, sizeToRead);
-  //
-  //   sizeNotCopiedToUser = copy_to_user(buf, myBuffer, sizeToRead);
-  //   logk((KERN_INFO "Could not copy %d bytes to user\n", sizeNotCopiedToUser);
-  //
-  //   kfree(myBuffer);
-  //
-  //   return (sizeToRead-sizeNotCopiedToUser);
-  return 0;
+  temperature = test_temperature_process();
+  nbCharsTemperatureString = temperatureToString(temperatureString, temperature);
+  sizeNotCopiedToUser = copy_to_user(buf, temperatureString, nbCharsTemperatureString);
+  sizeCopiedToUser = nbCharsTemperatureString - sizeNotCopiedToUser;
+  return sizeCopiedToUser;
 }
 
 static ssize_t read_led(struct file *f, char *buf, size_t size, loff_t *offset)
@@ -98,6 +97,10 @@ static int open(struct inode *in, struct file *f)
   if (MINOR(in->i_rdev) == LED)
   {
     fileOperations.read = read_led;
+  }
+  else if (MINOR(in->i_rdev) == SENSOR) 
+  {
+    fileOperations.read = read;
   }
   logk((KERN_INFO "Pid(%d) Open with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
   return errorCode;
@@ -129,22 +132,13 @@ static void test_discovery_process(void)
   performDiscovery(discoveredID);
 }
 
-/* based on memory map manual page 7 */
-/* from w1_therm.c */
-static inline int convertToCelsius(u8 rom[9])
+static int test_temperature_process(void)
 {
-  s16 temperature = le16_to_cpup((__le16 *)rom);
-  return temperature*1000/16;
-}
-
-static void test_temperature_process(void)
-{
-  u8 readedValues[9];
-  int temperature = 0;
+  Scratchpad scratchpadData;
+  long temperature = 0;
   /* attempt to read temperature */
   logk((KERN_INFO "Sending an initialization sequence...\n"));
   sendInitializationSequence();
-  //writeROMCommand(SKIP_ROM);
   writeROMCommand(MATCH_ROM);
   writeSensorID(discoveredID);
   writeFunctionCommand(CONVERT_TEMP);
@@ -157,11 +151,10 @@ static void test_temperature_process(void)
   writeSensorID(discoveredID);
   logk((KERN_INFO "send READ_SCRATCHPAD"));
   writeFunctionCommand(READ_SCRATCHPAD);
-  readTemperature(readedValues);
-  
-  temperature = convertToCelsius(readedValues);
-
-  logk((KERN_INFO "Readed temperature: %d", temperature));
+  readScratchpad(scratchpadData);
+  temperature = extractTemperatureFromScratchpad(scratchpadData);
+  logk((KERN_INFO "Readed temperature: %ld", temperature));
+  return temperature;
 }
 
 static void blinkGpioLed(void)
@@ -182,7 +175,7 @@ static void blinkGpioLed(void)
 static int init(void)
 {
   int errorCode = 0;
-
+  test_discovery_process();
   // trouver le nombre de capteurs.
   // TODO
 
@@ -207,8 +200,6 @@ static int init(void)
     logk((KERN_ALERT ">>> ERROR cdev_add\n"));
     return -EINVAL;
   }
-  test_discovery_process();
-  test_temperature_process();
 
  return(errorCode);
 }

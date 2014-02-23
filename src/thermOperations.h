@@ -21,10 +21,17 @@
 // refer to Table-2 from documentation
 #define TCONV 750
 
-void readTemperature( u8 readedScratchpad[9] );
+#define MAX_CHARS_TEMPERATURE 14 // max precision = 12, one char for '.' and one for '\0'
+typedef char TemperatureString[MAX_CHARS_TEMPERATURE];
+
+typedef u8 Scratchpad[9];
+
+void readScratchpad(Scratchpad readedScratchpad);
 void writeFunctionCommand(FunctionCommand command);
 void writeROMCommand(ROMCommand romcommand);
 void waitForConversionDone(void);
 void writeSensorID(SensorID sensorID);
+long extractTemperatureFromScratchpad(Scratchpad scratchpadData);
+int temperatureToString(TemperatureString result, long temperature);
 
 #endif /* end of include guard: __INC_THERMOPERATIONS__ */
