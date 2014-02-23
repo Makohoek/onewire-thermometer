@@ -8,7 +8,7 @@
  */
 #include "thermOperations.h"
 
-u8 getByte(SensorID sensorID, int whichByte);
+static u8 getByte(SensorID sensorID, int whichByte);
 
 void readTemperature( u8 readedScratchpad[9] )
 {
@@ -19,7 +19,7 @@ void readTemperature( u8 readedScratchpad[9] )
   }
   for ( i = 0; i < 9; i++ )
   {
-    logk((KERN_INFO "%x", readedScratchpad[i]));
+    logk((KERN_INFO "%2x", readedScratchpad[i]));
   }
 }
 
@@ -35,14 +35,20 @@ void writeROMCommand(ROMCommand romCommand)
 
 void waitForConversionDone(void)
 {
-  mdelay(TCONV);
   Bit statusConversion;
-  int maxAttempts = 255;
+  const int maxAttempts = 100;
+  int attempts = 0;
+  mdelay(TCONV/8); // wait for the minimum precision at least. (93.75ms when resolution = 9)
   do
   {
+    logk((KERN_INFO "Waiting for conversion... (attempt %3d/%3d)", attempts, maxAttempts));
     statusConversion = OneWireReadBit();
-    maxAttempts--;
-  }while(statusConversion != ONE && maxAttempts > 0); //waiting for the temperature to be fully converted to the scratchpad
+    attempts++;
+  }while(statusConversion != ONE && attempts < maxAttempts); //waiting for the temperature to be fully converted to the scratchpad
+  if (attempts >= maxAttempts)
+  {
+    logk((KERN_ALERT "ERROR: Sensor did not finished conversion in %d attempts!", maxAttempts));
+  }
   logk((KERN_INFO "Done converting the temperature"));
 }
 
@@ -64,17 +70,18 @@ void writeSensorID(SensorID sensorID)
 /**
  * Get one of the bytes from the sensorID
  */
-u8 getByte(SensorID sensorID, int whichByte)
+static u8 getByte(SensorID sensorID, int whichByte)
 {
-  int i, startIndex, endIndex;
+  int i, shift, startIndex, endIndex;
   u8 res = 0;
+  shift = 7;
   startIndex = (whichByte+1)*8-1;
   endIndex = 8*whichByte;
   logk((KERN_INFO "getByte(%d): looping from %d -> %d", whichByte, startIndex, endIndex));
   for (i = startIndex; i >= endIndex ; i--)
   {
-    res |= sensorID[i];
-    res = res << 1;
+    logk((KERN_INFO "Sensor(%d): %d %d", i, sensorID[i]));
+    res |= (sensorID[i] << (shift--));
   }
   return res;
 }

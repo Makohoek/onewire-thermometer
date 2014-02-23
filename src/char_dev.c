@@ -90,7 +90,7 @@ static int open(struct inode *in, struct file *f)
   logk((KERN_INFO "Pid(%d) Open with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
   if (MINOR(in->i_rdev) == LED)
   {
-    test_gpio_led();
+   // test_gpio_led();
   }
 
   return errorCode;
@@ -126,8 +126,8 @@ static void test_discovery_process(void)
 /* from w1_therm.c */
 static inline int convertToCelsius(u8 rom[9])
 {
-  s16 t = le16_to_cpup((__le16 *)rom);
-  return t*1000/16;
+  s16 temperature = le16_to_cpup((__le16 *)rom);
+  return temperature*1000/16;
 }
 
 #if 1
@@ -138,15 +138,21 @@ static void test_temperature_process(void)
   /* attempt to read temperature */
   logk((KERN_INFO "Sending an initialization sequence...\n"));
   sendInitializationSequence();
-  writeROMCommand(SKIP_ROM);
-  writeFunctionCommand(CONVERT_TEMP);
-  waitForConversionDone();
-
-  sendInitializationSequence();
+  //writeROMCommand(SKIP_ROM);
   writeROMCommand(MATCH_ROM);
   writeSensorID(discoveredID);
+  writeFunctionCommand(CONVERT_TEMP);
+  waitForConversionDone();
+  
+  sendInitializationSequence();
+  writeROMCommand(MATCH_ROM);
+  logk((KERN_INFO "Send match rom to this ID:"));
+  printSensorID(discoveredID);
+  writeSensorID(discoveredID);
+  logk((KERN_INFO "send READ_SCRATCHPAD"));
   writeFunctionCommand(READ_SCRATCHPAD);
   readTemperature(readedValues);
+  
   temperature = convertToCelsius(readedValues);
 
   logk((KERN_INFO "Readed temperature: %d", temperature));
@@ -184,7 +190,6 @@ static int init(void)
   /* display majors/minor */
   logk((KERN_INFO "Init allocated (major, minor)=(%d,%d)\n",MAJOR(dev),MINOR(dev)));
 
-
   /* allocating memory for our character device and linking fileOperations */
   myDevice = cdev_alloc();
   myDevice->ops = &fileOperations;
@@ -198,7 +203,7 @@ static int init(void)
     return -EINVAL;
   }
 
-//  test_gpio_led();
+//  test_gpio_led(); // should not be called when playing with 1wire bus
   test_discovery_process();
   test_temperature_process();
 

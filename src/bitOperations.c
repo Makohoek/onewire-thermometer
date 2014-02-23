@@ -87,16 +87,16 @@ static void assertPinIsValid( void )
 
 int initializeBus( int GpioPin )
 {
-  if (!gpio_is_valid(GpioPin))
+  int errorOccured;
+  mGpioPin = GpioPin;
+  if (!gpio_is_valid(mGpioPin))
   {
     logk((KERN_ALERT "ERROR: %d pin is not valid\n", mGpioPin));
     return -1;
   }
-  int errorOccured;
   // initialize the port we want to work on
-  mGpioPin = GpioPin;
   // request the gpio device
-  errorOccured = gpio_request_one(GpioPin, GPIOF_OPEN_DRAIN, "One-Wire Bus"); // used for w1 bus
+  errorOccured = gpio_request_one(mGpioPin, GPIOF_OPEN_DRAIN, "One-Wire Bus"); // used for w1 bus
   if (errorOccured)
   {
     logk((KERN_ALERT "ERROR occured requesting the GPIO pin\n"));

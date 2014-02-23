@@ -3,24 +3,21 @@
 
 typedef enum 
 {
-  SKIP_ROM = 0xCC, 
-  READ_ROM = 0x33, 
-  MATCH_ROM  = 0x55, 
-  SEARCH_ROM = 0xF0 
+  SKIP_ROM = 0xCC,
+  READ_ROM = 0x33,
+  MATCH_ROM  = 0x55,
+  SEARCH_ROM = 0xF0
 } ROMCommand;
 
-// check real hex values here
 typedef enum
 {
-  ALARM_SEARCH = 0xEC, 
-  CONVERT_TEMP = 0x44, 
-  READ_SCRATCHPAD = 0xBE, 
-  READ_PSUPPLY = 0xB4, 
-  RESUME_CMD = 0xA5
+  CONVERT_TEMP = 0x44,
+  READ_SCRATCHPAD = 0xBE,
+  WRITE_SCRATCHPAD = 0x4E,
   /* missing commands can be found in kernel/drivers/w1/w1.h */
 } FunctionCommand;
 
-typedef enum 
+typedef enum
 {
   ZERO = 0,
   ONE = 1

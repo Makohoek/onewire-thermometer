@@ -60,11 +60,16 @@ static int isBitIdONE(Bit bit, Bit complementaryBit)
 void printSensorID( SensorID sensorID )
 {
   int i;
-  for ( i = 0; i < 64; i+=4 )
+  for ( i = 0; i < 64; i+=8 )
   {
-    logk((KERN_INFO "%d %d %d %d", sensorID[i] == ZERO ? 0:1,
+    logk((KERN_INFO "%d%d%d%d %d%d%d%d", sensorID[i] == ZERO ? 0:1,
         sensorID[i+1] == ZERO ? 0:1,
         sensorID[i+2] == ZERO ? 0:1,
-        sensorID[i+3] == ZERO ? 0:1));
+        sensorID[i+3] == ZERO ? 0:1,
+        sensorID[i+4] == ZERO ? 0:1,
+        sensorID[i+5] == ZERO ? 0:1,
+        sensorID[i+6] == ZERO ? 0:1,
+        sensorID[i+7] == ZERO ? 0:1
+        ));
   }
 }

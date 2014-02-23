@@ -47,7 +47,7 @@ void OneWireWriteByte(u8 byteToWrite)
   {
     Bit bitToWrite = intToBit((byteToWrite >> i) & 0x1);
     OneWireWriteBit(bitToWrite);
-    logk((KERN_INFO "send %d to bus\n", BitToInt(bitToWrite)));
+    logk((KERN_INFO "send %d to 1w bus\n", BitToInt(bitToWrite)));
     udelay(2);
   }
 }
