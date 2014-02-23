@@ -25,6 +25,8 @@
 #include "led.h"
 #include "SensorID.h"
 
+//TODO: add IOCTL handling for specifying temperature precision (resolution)
+
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 2;
 static const unsigned char LED = 0;
