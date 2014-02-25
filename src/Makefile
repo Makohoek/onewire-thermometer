@@ -26,3 +26,6 @@ matthome:
 clean:
 	rm -rf *.o *.ko.* *.mod.* *.ko .[a-z] modules.order Module.symvers .*.cmd
 endif
+
+testioctl:
+	gcc -Wall testioctl.c -o testioctl

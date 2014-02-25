@@ -4,7 +4,7 @@
  * Alexandre Montilla
  * <alexandre.montilla@gmail.com>
  */
-#include <asm/uaccess.h>
+//#include <asm/uaccess.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
 #include <linux/delay.h>
@@ -26,8 +26,6 @@
 #include "dmesgLogging.h"
 #include "led.h"
 #include "thermOperations.h"
-
-//TODO: add IOCTL handling for specifying temperature precision (resolution)
 
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 2;
@@ -125,10 +123,8 @@ static int release(struct inode *in, struct file *f)
 {
   int errorCode = 0;
   logk((KERN_INFO "Pid(%d) Release with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
-
   return errorCode;
 }
-
 
 static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg)
 {
