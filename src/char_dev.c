@@ -4,7 +4,7 @@
  * Alexandre Montilla
  * <alexandre.montilla@gmail.com>
  */
-//#include <asm/uaccess.h>
+#include <asm/uaccess.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
 #include <linux/delay.h>
