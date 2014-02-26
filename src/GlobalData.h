@@ -29,5 +29,20 @@ typedef enum
   ONE = 1
 } Bit;
 
+typedef Bit SensorID[64];
+
+typedef enum
+{
+  MAXIMUM=12,
+  HIGH=11,
+  LOW=10,
+  MINIMUM=9
+} TemperatureResolution;
+
+typedef struct
+{
+  SensorID id;
+  TemperatureResolution resolution;
+}Sensor;
 
 #endif /* end of include guard: __INC_GLOBALDATA__ */

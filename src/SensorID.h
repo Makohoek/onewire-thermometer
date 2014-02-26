@@ -7,8 +7,6 @@
 #include "GlobalData.h"
 #include "OneWire.h"
 
-typedef Bit SensorID[64];
-
 void writeSensorID(SensorID sensorID);
 void printSensorID(SensorID sensorID);
 void affectSensorID(SensorID destination, SensorID source);

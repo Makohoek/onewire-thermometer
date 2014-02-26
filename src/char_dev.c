@@ -26,6 +26,7 @@
 #include "dmesgLogging.h"
 #include "led.h"
 #include "thermOperations.h"
+#include "LinkedList.h"
 
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 2;
@@ -64,9 +65,6 @@ struct priv_t
   unsigned int minor;
 };
 
-/* the sensor id */
-SensorID discoveredID = {ZERO};
-
 /* the current resolution for our sensor */
 TemperatureResolution mResolution = 12;
 
@@ -76,13 +74,8 @@ dev_t dev;
 /* struct cdev == a Character Device*/
 struct cdev *myDevice;
 
-typedef struct
-{
-  SensorID id;
-  TemperatureResolution resolution;
-}Sensor;
-// TODO move this to his own file and create appropriate functions
-Sensor mSensors[2];
+LinkedList* mSensorsList;
+Sensor mCurrentSensor; // the current open one
 
 /* led blinking for fun-only part */
 static void blinkGpioLed(void);
@@ -100,7 +93,7 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   int nbCharsTemperatureString = 0;
   TemperatureString temperatureString;
   logk((KERN_INFO "Read called!\n"));
-  temperature = test_temperature_process(mSensors[0]);
+  temperature = test_temperature_process(mCurrentSensor);//FIXME: not handled by open yet
   nbCharsTemperatureString = temperatureToString(temperatureString, temperature);
   sizeNotCopiedToUser = copy_to_user(buf, temperatureString, nbCharsTemperatureString);
   sizeCopiedToUser = nbCharsTemperatureString - sizeNotCopiedToUser;
@@ -163,6 +156,8 @@ static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg)
 
 static unsigned int discoverEachSensorID(void)
 {
+  Sensor* currentSensor;
+  SensorID discoveredID;
   unsigned int numberOfSensors;
   numberOfSensors = 0;
   while (!isEverySensorDiscovered())
@@ -171,7 +166,16 @@ static unsigned int discoverEachSensorID(void)
     sendInitializationSequence();
     writeROMCommand(SEARCH_ROM);
     performDiscovery(discoveredID);
-    affectSensorID(mSensors[numberOfSensors].id, discoveredID);
+
+    currentSensor = kmalloc(GFP_KERNEL, sizeof(Sensor));
+    if (currentSensor == NULL)
+    {
+      printk(KERN_ALERT "ERROR: failed to allocate memory");
+      return 0; 
+    }
+    affectSensorID(currentSensor->id, discoveredID);
+    currentSensor->resolution = MAXIMUM;
+    mSensorsList->writeItem(mSensorsList, currentSensor);
     numberOfSensors++;
   }
   return numberOfSensors;
@@ -227,18 +231,18 @@ static int test_temperature_process(Sensor sensor)
 
 static void setNewResolution(int newResolution)
 {
-  Scratchpad scratchpadData;
-  buildScratchpadNewResolution(scratchpadData, newResolution);
-  
-  mResolution = newResolution;
+ // Scratchpad scratchpadData;
+ // buildScratchpadNewResolution(scratchpadData, newResolution);
+ // 
+ // mResolution = newResolution;
 
-  /* WRITE_SCRATCHPAD */
-  logk((KERN_INFO "Sending an initialization sequence...\n"));
-  sendInitializationSequence();
-  writeROMCommand(MATCH_ROM);
-  writeSensorID(discoveredID);
-  writeFunctionCommand(WRITE_SCRATCHPAD);
-  writeScratchpad(scratchpadData);
+ // /* WRITE_SCRATCHPAD */
+ // logk((KERN_INFO "Sending an initialization sequence...\n"));
+ // sendInitializationSequence();
+ // writeROMCommand(MATCH_ROM);
+ // writeSensorID(discoveredID);
+ // writeFunctionCommand(WRITE_SCRATCHPAD);
+ // writeScratchpad(scratchpadData);
 }
 
 static void blinkGpioLed(void)
@@ -261,14 +265,10 @@ static int init(void)
   int i;
   unsigned int numberOfSensors = 0;
   int errorCode = 0;
-  for (i = 0; i < 2; ++i)
-  {
-    mSensors[i].resolution = MAXIMUM;
-    affectSensorID(mSensors[i].id, discoveredID);
-  }
   initializeOneWire();
+  mSensorsList = newLinkedList();
   numberOfSensors = discoverEachSensorID();
-  setNewResolution(mResolution); // set default resolution
+  printk(KERN_INFO "Discovered %d sensors", numberOfSensors);
 
   /* dynamic allocation for major/minors */
   if (alloc_chrdev_region(&dev, 0, NB_OF_MINORS, "thermAlexMatt") == -1)
@@ -298,6 +298,7 @@ static int init(void)
 static void cleanup(void)
 {
   deleteBus();
+  deleteLinkedList(mSensorsList);
   /* freeing memory and major,(s) */
   unregister_chrdev_region(dev,NB_OF_MINORS);
   cdev_del(myDevice);

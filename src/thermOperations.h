@@ -25,13 +25,6 @@
 #define MAX_CHARS_TEMPERATURE 14 // max precision = 12, one char for '.' and one for '\0'
 typedef char TemperatureString[MAX_CHARS_TEMPERATURE];
 typedef u8 Scratchpad[9];
-typedef enum
-{
-  MAXIMUM=12,
-  HIGH=11,
-  LOW=10,
-  MINIMUM=9
-} TemperatureResolution;
 
 void readScratchpad(Scratchpad readedScratchpad);
 void writeScratchpad(Scratchpad scratchpad);
