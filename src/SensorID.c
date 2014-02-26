@@ -36,12 +36,21 @@ static u8 getByte(SensorID sensorID, int whichByte)
   return res;
 }
 
+void affectSensorID(SensorID destination, SensorID source)
+{
+  int i;
+  for (i = 0; i < 64; ++i)
+  {
+    destination[i] = source[i];
+  }
+}
+
 void printSensorID(SensorID sensorID)
 {
   int i;
   for (i = 0; i < 64; i+=8)
   {
-    logk((KERN_INFO "%d%d%d%d %d%d%d%d", sensorID[i],
+    printk(KERN_INFO "%d%d%d%d %d%d%d%d", sensorID[i],
         sensorID[i+1],
         sensorID[i+2],
         sensorID[i+3],
@@ -49,6 +58,6 @@ void printSensorID(SensorID sensorID)
         sensorID[i+5],
         sensorID[i+6],
         sensorID[i+7]
-       ));
+       );
   }
 }

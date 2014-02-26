@@ -3,7 +3,7 @@
 
 #include <linux/kernel.h>
 
-#define LOGGING 1
+#define LOGGING 0
 #define logk(x); if (LOGGING) { printk x; }
 
 #endif /* end of include guard: __INC_DMESGLOGGING__ */

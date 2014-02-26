@@ -76,10 +76,18 @@ dev_t dev;
 /* struct cdev == a Character Device*/
 struct cdev *myDevice;
 
+typedef struct
+{
+  SensorID id;
+  TemperatureResolution resolution;
+}Sensor;
+
+Sensor mSensors[2];
+
 /* led blinking for fun-only part */
 static void blinkGpioLed(void);
 /* read temperature from the sensor */
-static int test_temperature_process(void);
+static int test_temperature_process(Sensor sensor);
 
 static void setNewResolution(int newResolution);
 
@@ -91,7 +99,7 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   int nbCharsTemperatureString = 0;
   TemperatureString temperatureString;
   logk((KERN_INFO "Read called!\n"));
-  temperature = test_temperature_process();
+  temperature = test_temperature_process(mSensors[0]);
   nbCharsTemperatureString = temperatureToString(temperatureString, temperature);
   sizeNotCopiedToUser = copy_to_user(buf, temperatureString, nbCharsTemperatureString);
   sizeCopiedToUser = nbCharsTemperatureString - sizeNotCopiedToUser;
@@ -167,9 +175,19 @@ static void DiscoverEachSensorID(void)
   sendInitializationSequence();
   writeROMCommand(SEARCH_ROM);
   performDiscovery(discoveredID);
+  affectSensorID(mSensors[0].id, discoveredID);
+  
+  sendInitializationSequence();
+  writeROMCommand(SEARCH_ROM);
+  performDiscovery(discoveredID);
+  affectSensorID(mSensors[1].id, discoveredID);
+  
+  sendInitializationSequence();
+  writeROMCommand(SEARCH_ROM);
+  performDiscovery(discoveredID);
 }
 
-static int test_temperature_process(void)
+static int test_temperature_process(Sensor sensor)
 {
   Scratchpad scratchpadData;
   long temperature = 0;
@@ -178,20 +196,21 @@ static int test_temperature_process(void)
   logk((KERN_INFO "Sending an initialization sequence...\n"));
   sendInitializationSequence();
   writeROMCommand(MATCH_ROM);
-  writeSensorID(discoveredID);
+  writeSensorID(sensor.id);
   writeFunctionCommand(CONVERT_TEMP);
   waitForConversionDone();
  
   /* READ_SCRATCHPAD */
+  logk((KERN_INFO "Send match rom to this ID:"));
+  printSensorID(sensor.id);
+
   sendInitializationSequence();
   writeROMCommand(MATCH_ROM);
-  logk((KERN_INFO "Send match rom to this ID:"));
-  printSensorID(discoveredID);
-  writeSensorID(discoveredID);
+  writeSensorID(sensor.id);
   logk((KERN_INFO "send READ_SCRATCHPAD"));
   writeFunctionCommand(READ_SCRATCHPAD);
   readScratchpad(scratchpadData);
-  temperature = extractTemperatureFromScratchpad(scratchpadData, mResolution);
+  temperature = extractTemperatureFromScratchpad(scratchpadData, sensor.resolution);
   logk((KERN_INFO "Readed temperature: %ld", temperature));
   return temperature;
 }
@@ -229,7 +248,13 @@ static void blinkGpioLed(void)
 
 static int init(void)
 {
+  int i;
   int errorCode = 0;
+  for (i = 0; i < 2; ++i)
+  {
+    mSensors[i].resolution = MAXIMUM;
+    affectSensorID(mSensors[i].id, discoveredID);
+  }
   DiscoverEachSensorID();
   setNewResolution(mResolution); // set default resolution
   // trouver le nombre de capteurs.
@@ -259,7 +284,6 @@ static int init(void)
 
  return(errorCode);
 }
-
 
 static void cleanup(void)
 {

@@ -11,5 +11,6 @@ typedef Bit SensorID[64];
 
 void writeSensorID(SensorID sensorID);
 void printSensorID(SensorID sensorID);
+void affectSensorID(SensorID destination, SensorID source);
 
 #endif /* end of include guard: __INC_SENSORID__ */
