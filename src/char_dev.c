@@ -18,15 +18,7 @@
 #include <linux/sched.h>
 #include <linux/types.h>
 
-#include "DiscoveryProtocol.h"
-#include "GlobalData.h"
-#include "OneWire.h"
-#include "SensorID.h"
-#include "bitOperations.h"
-#include "dmesgLogging.h"
-#include "led.h"
-#include "thermOperations.h"
-#include "LinkedList.h"
+#include "SensorOperations.h"
 
 /* minor aliases */
 static const unsigned char NB_OF_MINORS = 2;
@@ -41,7 +33,7 @@ static const unsigned char SENSOR = 1;
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 /* Module parameters */
-static int GpioPort = 2;
+static int mGpioPin = 2;
 
 /* Standard character device operations */
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset);
@@ -74,12 +66,6 @@ struct cdev *myDevice;
 LinkedList* mSensorsList;
 Sensor* mCurrentSensor; // the current open one
 
-/* led blinking for fun-only part */
-static void blinkGpioLed(void);
-/* read temperature from the sensor */
-static int test_temperature_process(Sensor sensor);
-static void setNewResolution(Sensor sensor);
-
 // TODO change read to current openedSensor
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
 {
@@ -90,7 +76,7 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   TemperatureString temperatureString;
   mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, 0);
   logk((KERN_INFO "Read called!\n"));
-  temperature = test_temperature_process(*mCurrentSensor);
+  temperature = sensorRequestTemperature(*mCurrentSensor);
   nbCharsTemperatureString = temperatureToString(temperatureString, temperature);
   sizeNotCopiedToUser = copy_to_user(buf, temperatureString, nbCharsTemperatureString);
   sizeCopiedToUser = nbCharsTemperatureString - sizeNotCopiedToUser;
@@ -152,116 +138,11 @@ static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg)
   return 0;
 }
 
-static unsigned int discoverEachSensorID(LinkedList* sensorsList)
-{
-  Sensor* currentSensor;
-  SensorID discoveredID;
-  unsigned int numberOfSensors;
-  numberOfSensors = 0;
-  while (!isEverySensorDiscovered())
-  {
-    logk((KERN_INFO "Sending an initialization sequence...\n"));
-    sendInitializationSequence();
-    writeROMCommand(SEARCH_ROM);
-    performDiscovery(discoveredID);
-
-    currentSensor = kmalloc(GFP_KERNEL, sizeof(Sensor));
-    if (currentSensor == NULL)
-    {
-      printk(KERN_ALERT "ERROR: failed to allocate memory");
-      return 0;
-    }
-    affectSensorID(currentSensor->id, discoveredID);
-    currentSensor->resolution = MAXIMUM;
-    sensorsList->writeItem(sensorsList, currentSensor);
-    numberOfSensors++;
-  }
-  return numberOfSensors;
-}
-
-static void initializeOneWire(void)
-{
-  /* displays GPIO port */
-  logk((KERN_INFO "GpioPort=%d\n", GpioPort));
-  if (initializeBus(GpioPort))
-  {
-    logk((KERN_INFO "Gpio initialized"));
-  }
-  else
-  {
-    logk((KERN_ALERT "ERROR while calling initializeGPIO"));
-  }
-}
-
-// add led turning on when processing sensor
-static int test_temperature_process(Sensor sensor)
-{
-  Scratchpad scratchpadData;
-  long temperature = 0;
-
-  initializeLed();
-  turnLedOn();
- 
-  /* CONVERT-T */
-  logk((KERN_INFO "Sending an initialization sequence...\n"));
-  sendInitializationSequence();
-  writeROMCommand(MATCH_ROM);
-  writeSensorID(sensor.id);
-  writeFunctionCommand(CONVERT_TEMP);
-  waitForConversionDone();
-  turnLedOff();
-  freeLed();
- 
-  /* READ_SCRATCHPAD */
-  logk((KERN_INFO "Send match rom to this ID:"));
-  printSensorID(sensor.id);
-
-  sendInitializationSequence();
-  writeROMCommand(MATCH_ROM);
-  writeSensorID(sensor.id);
-  logk((KERN_INFO "send READ_SCRATCHPAD"));
-  writeFunctionCommand(READ_SCRATCHPAD);
-  readScratchpad(scratchpadData);
-  temperature = extractTemperatureFromScratchpad(scratchpadData, sensor.resolution);
-  logk((KERN_INFO "Readed temperature: %ld", temperature));
-  return temperature;
-}
-
-static void setNewResolution(Sensor sensor)
-{
-  Scratchpad scratchpadData;
-  buildScratchpadNewResolution(scratchpadData, sensor.resolution);
-
-  /* WRITE_SCRATCHPAD */
-  logk((KERN_INFO "Sending an initialization sequence...\n"));
-  sendInitializationSequence();
-  writeROMCommand(MATCH_ROM);
-  writeSensorID(sensor.id);
-  writeFunctionCommand(WRITE_SCRATCHPAD);
-  writeScratchpad(scratchpadData);
-}
-
-static void blinkGpioLed(void)
-{
-  int i;
-  initializeLed();
-  logk((KERN_INFO "Blinking led 3 times\n"));
-  for ( i = 0; i < 3; i++ )
-  {
-    turnLedOn();
-    msleep(1000);
-    turnLedOff();
-    msleep(1000);
-  }
-  freeLed();
-}
-
 static int init(void)
 {
-  int i;
   unsigned int numberOfSensors = 0;
   int errorCode = 0;
-  initializeOneWire();
+  initializeOneWire(mGpioPin);
   mSensorsList = newLinkedList();
   numberOfSensors = discoverEachSensorID(mSensorsList);
   printk(KERN_INFO "Discovered %d sensors", numberOfSensors);
@@ -303,8 +184,8 @@ static void cleanup(void)
 module_exit(cleanup);
 module_init(init);
 
-module_param(GpioPort, int, S_IRUGO | S_IWUSR);
-MODULE_PARM_DESC(GpioPort, "Used GPIO port for the thermometer");
+module_param(mGpioPin, int, S_IRUGO | S_IWUSR);
+MODULE_PARM_DESC(mGpioPin, "Used GPIO port for the thermometer");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Mattijs Korpershoek / Alexandre Montilla");
 MODULE_DESCRIPTION("1-Wire Digital thermometer DS18B2 driver");

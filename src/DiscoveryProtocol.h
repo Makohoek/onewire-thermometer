@@ -1,10 +1,10 @@
 #ifndef __INC_DISCOVERYPROTOCOL__
 #define __INC_DISCOVERYPROTOCOL__
 
-#include "OneWire.h"
-#include "dmesgLogging.h"
 #include "GlobalData.h"
+#include "OneWire.h"
 #include "SensorID.h"
+#include "dmesgLogging.h"
 
 void performDiscovery( SensorID discoveredSensorID );
 Bool isEverySensorDiscovered(void);
