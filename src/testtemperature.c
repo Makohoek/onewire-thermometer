@@ -17,6 +17,9 @@
 #include <fcntl.h>
 /* required for close */
 #include <unistd.h>
+/* required for printing time */
+#include <sys/time.h>
+#include <time.h>
 
 static inline void assertOnPosixError(int value);
 
@@ -33,13 +36,32 @@ int main(int argc, const char *argv[])
   return EXIT_SUCCESS;
 }
 
+static inline void getTimeString()
+{
+  struct timeval tv; 
+  struct tm* ptm; 
+  char time_string[40]; 
+  long milliseconds; 
+  /* Obtain the time of day, and convert it to a tm struct. */ 
+  gettimeofday (&tv, NULL); 
+  ptm = localtime (&tv.tv_sec); 
+  /* Format the date and time, down to a single second. */ 
+  strftime (time_string, sizeof (time_string), "%H:%M:%S", ptm); 
+  /* Compute milliseconds from microseconds. */ 
+  milliseconds = tv.tv_usec / 1000; 
+  /* Print the formatted time, in seconds, followed by a decimal point 
+     and the milliseconds. */ 
+  printf ("%s.%03ld", time_string, milliseconds); 
+}
+
 static inline void performOneRead(const char* fileName)
 {
   char temperatureString[512]={'\0'};
   int fd = open(fileName, O_RDONLY);
   assertOnPosixError(fd);
   assertOnPosixError(read(fd, temperatureString, 512));
-  printf("%s\n", temperatureString);
+  getTimeString();
+  printf("\t%s\n", temperatureString);
   assertOnPosixError(close(fd));
 }
 
