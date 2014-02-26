@@ -65,9 +65,6 @@ struct priv_t
   unsigned int minor;
 };
 
-/* the current resolution for our sensor */
-TemperatureResolution mResolution = 12;
-
 /* dev_t contains major and minor version */
 dev_t dev;
 
@@ -75,14 +72,13 @@ dev_t dev;
 struct cdev *myDevice;
 
 LinkedList* mSensorsList;
-Sensor mCurrentSensor; // the current open one
+Sensor* mCurrentSensor; // the current open one
 
 /* led blinking for fun-only part */
 static void blinkGpioLed(void);
 /* read temperature from the sensor */
 static int test_temperature_process(Sensor sensor);
-// TODO: change this to be compatible with sensor structure
-static void setNewResolution(int newResolution);
+static void setNewResolution(Sensor sensor);
 
 // TODO change read to current openedSensor
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
@@ -92,8 +88,9 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   int sizeCopiedToUser = 0;
   int nbCharsTemperatureString = 0;
   TemperatureString temperatureString;
+  mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, 0);
   logk((KERN_INFO "Read called!\n"));
-  temperature = test_temperature_process(mCurrentSensor);//FIXME: not handled by open yet
+  temperature = test_temperature_process(*mCurrentSensor);
   nbCharsTemperatureString = temperatureToString(temperatureString, temperature);
   sizeNotCopiedToUser = copy_to_user(buf, temperatureString, nbCharsTemperatureString);
   sizeCopiedToUser = nbCharsTemperatureString - sizeNotCopiedToUser;
@@ -145,7 +142,8 @@ static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg)
       {
         return -ENOTTY;
       }
-      setNewResolution(arg);
+      mCurrentSensor->resolution = arg;
+      setNewResolution(*mCurrentSensor);
       break;
     default:
       return -ENOTTY;
@@ -154,7 +152,7 @@ static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg)
   return 0;
 }
 
-static unsigned int discoverEachSensorID(void)
+static unsigned int discoverEachSensorID(LinkedList* sensorsList)
 {
   Sensor* currentSensor;
   SensorID discoveredID;
@@ -171,11 +169,11 @@ static unsigned int discoverEachSensorID(void)
     if (currentSensor == NULL)
     {
       printk(KERN_ALERT "ERROR: failed to allocate memory");
-      return 0; 
+      return 0;
     }
     affectSensorID(currentSensor->id, discoveredID);
     currentSensor->resolution = MAXIMUM;
-    mSensorsList->writeItem(mSensorsList, currentSensor);
+    sensorsList->writeItem(sensorsList, currentSensor);
     numberOfSensors++;
   }
   return numberOfSensors;
@@ -229,20 +227,18 @@ static int test_temperature_process(Sensor sensor)
   return temperature;
 }
 
-static void setNewResolution(int newResolution)
+static void setNewResolution(Sensor sensor)
 {
- // Scratchpad scratchpadData;
- // buildScratchpadNewResolution(scratchpadData, newResolution);
- // 
- // mResolution = newResolution;
+  Scratchpad scratchpadData;
+  buildScratchpadNewResolution(scratchpadData, sensor.resolution);
 
- // /* WRITE_SCRATCHPAD */
- // logk((KERN_INFO "Sending an initialization sequence...\n"));
- // sendInitializationSequence();
- // writeROMCommand(MATCH_ROM);
- // writeSensorID(discoveredID);
- // writeFunctionCommand(WRITE_SCRATCHPAD);
- // writeScratchpad(scratchpadData);
+  /* WRITE_SCRATCHPAD */
+  logk((KERN_INFO "Sending an initialization sequence...\n"));
+  sendInitializationSequence();
+  writeROMCommand(MATCH_ROM);
+  writeSensorID(sensor.id);
+  writeFunctionCommand(WRITE_SCRATCHPAD);
+  writeScratchpad(scratchpadData);
 }
 
 static void blinkGpioLed(void)
@@ -267,7 +263,7 @@ static int init(void)
   int errorCode = 0;
   initializeOneWire();
   mSensorsList = newLinkedList();
-  numberOfSensors = discoverEachSensorID();
+  numberOfSensors = discoverEachSensorID(mSensorsList);
   printk(KERN_INFO "Discovered %d sensors", numberOfSensors);
 
   /* dynamic allocation for major/minors */
