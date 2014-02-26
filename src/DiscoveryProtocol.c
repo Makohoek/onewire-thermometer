@@ -1,11 +1,10 @@
 #include "DiscoveryProtocol.h"
 
-#define TRUE 1
-#define FALSE 0
+static Bool mExploredBits[64] = {FALSE};
 
 static int isBitIdZERO(Bit bit, Bit complementaryBit);
 static int isBitIdONE(Bit bit, Bit complementaryBit);
-unsigned char isHighestUnknownBit(unsigned char exploredBits[64], int currentBitIndex);
+static Bool isHighestUnknownBit(int currentBitIndex);
 
 /*
  * discovery process of the sensors IDs.
@@ -13,7 +12,6 @@ unsigned char isHighestUnknownBit(unsigned char exploredBits[64], int currentBit
  */
 void performDiscovery( SensorID discoveredSensorID )
 {
-  static unsigned char exploredBits[64] = {FALSE};
   int i;
   Bit responseBit, bit, complementaryBit;
   logk((KERN_INFO "Discovery protocol: started\n"));
@@ -25,12 +23,12 @@ void performDiscovery( SensorID discoveredSensorID )
     if (isBitIdZERO(bit, complementaryBit))
     {
       responseBit = ZERO;
-      exploredBits[i] = TRUE;
+      mExploredBits[i] = TRUE;
     }
     else if (isBitIdONE(bit, complementaryBit))
     {
       responseBit = ONE;
-      exploredBits[i] = TRUE;
+      mExploredBits[i] = TRUE;
     }
     else if (bit == ONE && complementaryBit == ONE)
     {
@@ -39,11 +37,11 @@ void performDiscovery( SensorID discoveredSensorID )
     }
     else
     {
-      if (isHighestUnknownBit(exploredBits, i))
+      if (isHighestUnknownBit(i))
       {
         // its the last one, we can select ONE here and mark the bit as explored
         responseBit = ONE;
-        exploredBits[i] = TRUE;
+        mExploredBits[i] = TRUE;
       }
       else
       {
@@ -51,7 +49,7 @@ void performDiscovery( SensorID discoveredSensorID )
         // Arbitrary we want to keep the ONE :)
         logk((KERN_INFO "Discovery protocol[bit %d]: don't know", i));
         responseBit = ZERO;
-        exploredBits[i] = FALSE;
+        mExploredBits[i] = FALSE;
       }
     }
     // select which one can survive
@@ -64,13 +62,26 @@ void performDiscovery( SensorID discoveredSensorID )
   printSensorID(discoveredSensorID);
 }
 
-unsigned char isHighestUnknownBit(unsigned char exploredBits[64], int currentBitIndex)
+Bool isEverySensorDiscovered(void)
+{
+  int i;
+  for (i = 0; i < 64; ++i)
+  {
+    if (mExploredBits[i] == FALSE)
+    {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+static Bool isHighestUnknownBit(int currentBitIndex)
 {
   int i;
   unsigned char result = TRUE;
   for (i = currentBitIndex+1; i < 64-currentBitIndex; ++i)
   {
-    if (exploredBits[i] == FALSE)
+    if (mExploredBits[i] == FALSE)
     {
       return FALSE;
     }

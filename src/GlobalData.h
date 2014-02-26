@@ -1,6 +1,12 @@
 #ifndef __INC_GLOBALDATA__
 #define __INC_GLOBALDATA__
 
+typedef enum
+{
+  FALSE=0,
+  TRUE=1,
+} Bool;
+
 typedef enum 
 {
   SKIP_ROM = 0xCC,

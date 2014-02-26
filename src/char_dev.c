@@ -161,7 +161,23 @@ static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg)
   return 0;
 }
 
-static void DiscoverEachSensorID(void)
+static unsigned int discoverEachSensorID(void)
+{
+  unsigned int numberOfSensors;
+  numberOfSensors = 0;
+  while (!isEverySensorDiscovered())
+  {
+    logk((KERN_INFO "Sending an initialization sequence...\n"));
+    sendInitializationSequence();
+    writeROMCommand(SEARCH_ROM);
+    performDiscovery(discoveredID);
+    affectSensorID(mSensors[numberOfSensors].id, discoveredID);
+    numberOfSensors++;
+  }
+  return numberOfSensors;
+}
+
+static void initializeOneWire(void)
 {
   /* displays GPIO port */
   logk((KERN_INFO "GpioPort=%d\n", GpioPort));
@@ -173,20 +189,6 @@ static void DiscoverEachSensorID(void)
   {
     logk((KERN_ALERT "ERROR while calling initializeGPIO"));
   }
-  logk((KERN_INFO "Sending an initialization sequence...\n"));
-  sendInitializationSequence();
-  writeROMCommand(SEARCH_ROM);
-  performDiscovery(discoveredID);
-  affectSensorID(mSensors[0].id, discoveredID);
-  
-  sendInitializationSequence();
-  writeROMCommand(SEARCH_ROM);
-  performDiscovery(discoveredID);
-  affectSensorID(mSensors[1].id, discoveredID);
-  
-  sendInitializationSequence();
-  writeROMCommand(SEARCH_ROM);
-  performDiscovery(discoveredID);
 }
 
 // add led turning on when processing sensor
@@ -257,19 +259,19 @@ static void blinkGpioLed(void)
 static int init(void)
 {
   int i;
+  unsigned int numberOfSensors = 0;
   int errorCode = 0;
   for (i = 0; i < 2; ++i)
   {
     mSensors[i].resolution = MAXIMUM;
     affectSensorID(mSensors[i].id, discoveredID);
   }
-  DiscoverEachSensorID();
+  initializeOneWire();
+  numberOfSensors = discoverEachSensorID();
   setNewResolution(mResolution); // set default resolution
-  // trouver le nombre de capteurs.
-  // TODO
 
   /* dynamic allocation for major/minors */
-  if (alloc_chrdev_region(&dev, 0, NB_OF_MINORS, "sample") == -1)
+  if (alloc_chrdev_region(&dev, 0, NB_OF_MINORS, "thermAlexMatt") == -1)
   {
     logk((KERN_ALERT ">>> ERROR alloc_chrdev_region\n"));
     return -EINVAL;
