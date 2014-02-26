@@ -81,16 +81,17 @@ typedef struct
   SensorID id;
   TemperatureResolution resolution;
 }Sensor;
-
+// TODO move this to his own file and create appropriate functions
 Sensor mSensors[2];
 
 /* led blinking for fun-only part */
 static void blinkGpioLed(void);
 /* read temperature from the sensor */
 static int test_temperature_process(Sensor sensor);
-
+// TODO: change this to be compatible with sensor structure
 static void setNewResolution(int newResolution);
 
+// TODO change read to current openedSensor
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
 {
   int temperature = 0;
@@ -112,6 +113,7 @@ static ssize_t read_led(struct file *f, char *buf, size_t size, loff_t *offset)
   return 0;
 }
 
+// change open based on them sensors
 static int open(struct inode *in, struct file *f)
 {
   int errorCode = 0;
@@ -187,10 +189,14 @@ static void DiscoverEachSensorID(void)
   performDiscovery(discoveredID);
 }
 
+// add led turning on when processing sensor
 static int test_temperature_process(Sensor sensor)
 {
   Scratchpad scratchpadData;
   long temperature = 0;
+
+  initializeLed();
+  turnLedOn();
  
   /* CONVERT-T */
   logk((KERN_INFO "Sending an initialization sequence...\n"));
@@ -199,6 +205,8 @@ static int test_temperature_process(Sensor sensor)
   writeSensorID(sensor.id);
   writeFunctionCommand(CONVERT_TEMP);
   waitForConversionDone();
+  turnLedOff();
+  freeLed();
  
   /* READ_SCRATCHPAD */
   logk((KERN_INFO "Send match rom to this ID:"));
