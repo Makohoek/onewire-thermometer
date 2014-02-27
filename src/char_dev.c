@@ -146,6 +146,7 @@ static int init(void)
   mSensorsList = newLinkedList();
   numberOfSensors = discoverEachSensorID(mSensorsList);
   printk(KERN_INFO "Discovered %d sensors", numberOfSensors);
+  mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, 0);
 
   /* dynamic allocation for major/minors */
   if (alloc_chrdev_region(&dev, 0, NB_OF_MINORS, "thermAlexMatt") == -1)
