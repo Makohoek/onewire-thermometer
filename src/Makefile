@@ -21,7 +21,7 @@ matt:
 	$(MAKE) ARCH=arm CROSS_COMPILE=arm-eabi- -C ${KERNEL_DIR} M=$(PWD) modules
 	scp -r *.o *.mod.* *.ko *.sh modules.order Module.symvers .*.cmd .tmp_versions root@olinuxino:~/AlexMattijs
 matthome:
-	$(MAKE) ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -C ${KERNEL_DIR} M=$(PWD) modules
+	$(MAKE) ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -Wall -C ${KERNEL_DIR} M=$(PWD) modules
 	scp -r *.o *.mod.* *.ko *.sh modules.order Module.symvers .*.cmd .tmp_versions Makefile testioctl.c testtemperature.c root@192.168.0.1:~/AlexMattijs
 clean:
 	rm -rf *.o *.ko.* *.mod.* *.ko .[a-z] modules.order Module.symvers .*.cmd

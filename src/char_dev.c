@@ -32,7 +32,7 @@
 #include "SensorOperations.h"
 
 /* minor aliases */
-static const unsigned char NB_OF_MINORS = 2;
+static unsigned char mNbOfMinors = 0;
 static const unsigned char LED = 0;
 static const unsigned char SENSOR = 1;
 
@@ -48,13 +48,12 @@ static int mGpioPin = 2;
 
 /* Standard character device operations */
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset);
-static ssize_t read_led(struct file *f, char *buf, size_t size, loff_t *offset);
 static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg);
 static int open(struct inode *in, struct file *f);
 static int release(struct inode *in, struct file *f);
 
 /* File operations for our character device */
-static struct file_operations fileOperations = 
+static struct file_operations fileOperations =
 {
   .read = read,
   .write = NULL,
@@ -74,18 +73,15 @@ dev_t dev;
 /* device class */
 static struct class* thermClass = NULL;
 
-static struct device* thermDevice = NULL;
-
 /* struct cdev == a Character Device*/
 struct cdev *myDevice;
 
-LinkedList* mSensorsList;
-Sensor* mCurrentSensor; // the current open one
-
+LinkedList* mSensorsList = NULL;
+Sensor* mCurrentSensor = NULL; // the current open one
 
 unsigned int discoverEachSensorID(void)
 {
-  Sensor* currentSensor;
+  Sensor* currentSensor = NULL;
   SensorID discoveredID;
   unsigned int numberOfSensors = 0;
   unsigned int maxRetries = 10;
@@ -94,18 +90,20 @@ unsigned int discoverEachSensorID(void)
     logk((KERN_INFO "Sending an initialization sequence...\n"));
     while (sendInitializationSequence() < 0); // send an initialization sequence until we get a response
     writeROMCommand(SEARCH_ROM);
-    performDiscovery(discoveredID);
-
-    currentSensor = kmalloc(GFP_KERNEL, sizeof(Sensor));
-    if (currentSensor == NULL)
+    if (performDiscovery(discoveredID) >= 0)
     {
-      printk(KERN_ALERT "ERROR: failed to allocate memory");
-      return 0;
+      currentSensor = kmalloc(sizeof(Sensor), GFP_KERNEL);
+      if (currentSensor == NULL)
+      {
+        printk(KERN_ALERT "ERROR: failed to allocate memory");
+        return 0;
+      }
+      affectSensorID(currentSensor->id, discoveredID);
+      currentSensor->resolution = MAXIMUM;
+      mSensorsList->writeItem(mSensorsList, currentSensor);
+      numberOfSensors++;
     }
-    affectSensorID(currentSensor->id, discoveredID);
-    currentSensor->resolution = MAXIMUM;
-    mSensorsList->writeItem(mSensorsList, currentSensor);
-    numberOfSensors++;
+
     maxRetries--;
   }
   return numberOfSensors;
@@ -126,19 +124,15 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   return sizeCopiedToUser;
 }
 
-static ssize_t read_led(struct file *f, char *buf, size_t size, loff_t *offset)
-{
-  blinkGpioLed();
-  return 0;
-}
-
 // change open based on them sensors
 static int open(struct inode *in, struct file *f)
 {
   int errorCode = 0;
+//  int sensorIndex = MINOR(in->i_rdev);
+//  mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, sensorIndex);
   if (MINOR(in->i_rdev) == LED)
   {
-    fileOperations.read = read_led;
+    //fileOperations.read = read_led;
   }
   else if (MINOR(in->i_rdev) == SENSOR) 
   {
@@ -185,14 +179,16 @@ static int init(void)
 {
   unsigned int numberOfSensors = 0;
   int errorCode = 0;
+  int i;
   initializeOneWire(mGpioPin);
   mSensorsList = newLinkedList();
   numberOfSensors = discoverEachSensorID();
   printk(KERN_INFO "Discovered %d sensors", numberOfSensors);
   mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, 0);
+  mNbOfMinors = numberOfSensors;
 
   /* dynamic allocation for major/minors */
-  if (alloc_chrdev_region(&dev, 0, NB_OF_MINORS, "sample") < 0)
+  if (alloc_chrdev_region(&dev, 0, mNbOfMinors, "sample") < 0)
   {
     logk((KERN_ALERT ">>> ERROR alloc_chrdev_region\n"));
     return -EINVAL;
@@ -213,7 +209,7 @@ static int init(void)
   myDevice->owner = THIS_MODULE;
 
   /* link between chrdev region and fileOperations */
-  errorCode = cdev_add(myDevice,dev,NB_OF_MINORS);
+  errorCode = cdev_add(myDevice,dev, mNbOfMinors);
   if (errorCode < 0)
   {
     logk((KERN_ALERT ">>> ERROR cdev_add\n"));
@@ -222,39 +218,50 @@ static int init(void)
   printk(KERN_INFO "Cdev added");
 
   /* creation of /dev/ points */
- thermClass = class_create(THIS_MODULE, "thermAlexMatt");
- if (IS_ERR(thermClass)) 
- {
-   printk(KERN_ALERT "failed to register device class\n");
-   goto failed_classreg;
- }
-
-  thermDevice = device_create(thermClass, NULL, MKDEV(MAJOR(dev), MINOR(dev)), NULL, "thermAlexMatt%d", 0);
-  if (IS_ERR(thermDevice)) {
-    printk(KERN_ALERT "failed to create device");
-    goto failed_devreg;
+  thermClass = class_create(THIS_MODULE, "thermAlexMatt");
+  if (IS_ERR(thermClass)) 
+  {
+    printk(KERN_ALERT "failed to register device class\n");
+    goto failed_classreg;
   }
- return 0;
+  printk(KERN_INFO "thermClass added!");
+
+  for (i = 0; i < mNbOfMinors; ++i)
+  {
+    struct device* thermDevice = device_create(thermClass, NULL, MKDEV(MAJOR(dev), MINOR(dev)+i), NULL, "thermAlexMatt%d", i);
+    if (IS_ERR(thermDevice))
+    {
+      printk(KERN_ALERT "failed to create device");
+      goto failed_devreg;
+    }
+  }
+  printk(KERN_INFO "added %d devices to /dev/", mNbOfMinors);
+  return 0;
 
 failed_devreg:
   class_unregister(thermClass);
   class_destroy(thermClass);
 failed_classreg:
-  unregister_chrdev_region(dev, NB_OF_MINORS);
+  unregister_chrdev_region(dev, mNbOfMinors);
   return -1;
 }
 
 static void cleanup(void)
 {
+  int i;
   deleteBus();
   deleteLinkedList(mSensorsList);
 
-  device_destroy(thermClass, MKDEV(MAJOR(dev), MINOR(dev)));
+
+  for (i = 0; i < mNbOfMinors; ++i)
+  {
+    device_destroy(thermClass, MKDEV(MAJOR(dev), MINOR(dev)+i));
+  }
   class_unregister(thermClass);
   class_destroy(thermClass);
-  
+
   /* freeing memory and major,(s) */
-  unregister_chrdev_region(dev,NB_OF_MINORS);
+  unregister_chrdev_region(dev,mNbOfMinors);
   if (myDevice != NULL)
     cdev_del(myDevice);
 
