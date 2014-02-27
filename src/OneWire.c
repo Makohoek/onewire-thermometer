@@ -35,6 +35,7 @@ int sendInitializationSequence( void )
   else
   {
     logk((KERN_ALERT "ERROR: No device answered to initialization sequence\n"));
+    presencePulse = -1;
   }
   udelay(240);
   return presencePulse;

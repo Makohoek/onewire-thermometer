@@ -17,6 +17,8 @@
 #include <linux/moduleparam.h>
 #include <linux/sched.h>
 #include <linux/types.h>
+#include <linux/slab.h>
+#include <linux/gfp.h>
 
 #include "DiscoveryProtocol.h"
 #include "GlobalData.h"
@@ -75,20 +77,49 @@ struct cdev *myDevice;
 LinkedList* mSensorsList;
 Sensor* mCurrentSensor; // the current open one
 
+
+unsigned int discoverEachSensorID(void)
+{
+  Sensor* currentSensor;
+  SensorID discoveredID;
+  unsigned int numberOfSensors = 0;
+  unsigned int maxRetries = 10;
+  while (!isEverySensorDiscovered() && maxRetries > 0)
+  {
+    logk((KERN_INFO "Sending an initialization sequence...\n"));
+    sendInitializationSequence();
+    writeROMCommand(SEARCH_ROM);
+    performDiscovery(discoveredID);
+
+    currentSensor = kmalloc(GFP_KERNEL, sizeof(Sensor));
+    if (currentSensor == NULL)
+    {
+      printk(KERN_ALERT "ERROR: failed to allocate memory");
+      return 0;
+    }
+    affectSensorID(currentSensor->id, discoveredID);
+    currentSensor->resolution = MAXIMUM;
+    mSensorsList->writeItem(mSensorsList, currentSensor);
+    numberOfSensors++;
+    maxRetries--;
+  }
+  return numberOfSensors;
+}
+
 // TODO change read to current openedSensor
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
 {
- // int temperature = 0;
- // int sizeNotCopiedToUser = 0;
+  int temperature = 0;
+  int sizeNotCopiedToUser = 0;
   int sizeCopiedToUser = 0;
- // int nbCharsTemperatureString = 0;
- // TemperatureString temperatureString;
- // mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, 0);
- // logk((KERN_INFO "Read called!\n"));
- // temperature = sensorRequestTemperature(*mCurrentSensor);
- // nbCharsTemperatureString = temperatureToString(temperatureString, temperature);
- // sizeNotCopiedToUser = copy_to_user(buf, temperatureString, nbCharsTemperatureString);
- // sizeCopiedToUser = nbCharsTemperatureString - sizeNotCopiedToUser;
+  int nbCharsTemperatureString = 0;
+  TemperatureString temperatureString;
+  mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, 0);
+  logk((KERN_INFO "Read called!\n"));
+  temperature = sensorRequestTemperature(*mCurrentSensor);
+  nbCharsTemperatureString = temperatureToString(temperatureString, temperature);
+  sizeNotCopiedToUser = copy_to_user(buf, temperatureString, nbCharsTemperatureString);
+  sizeCopiedToUser = nbCharsTemperatureString - sizeNotCopiedToUser;
   return sizeCopiedToUser;
 }
 
@@ -102,15 +133,15 @@ static ssize_t read_led(struct file *f, char *buf, size_t size, loff_t *offset)
 static int open(struct inode *in, struct file *f)
 {
   int errorCode = 0;
-//  if (MINOR(in->i_rdev) == LED)
-//  {
-//    fileOperations.read = read_led;
-//  }
-//  else if (MINOR(in->i_rdev) == SENSOR) 
-//  {
-//    fileOperations.read = read;
-//  }
-//  logk((KERN_INFO "Pid(%d) Open with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
+  if (MINOR(in->i_rdev) == LED)
+  {
+    fileOperations.read = read_led;
+  }
+  else if (MINOR(in->i_rdev) == SENSOR) 
+  {
+    fileOperations.read = read;
+  }
+  logk((KERN_INFO "Pid(%d) Open with (major,minor) = (%d,%d)\n", current->tgid, MAJOR(in->i_rdev), MINOR(in->i_rdev)));
   return errorCode;
 }
 
@@ -137,8 +168,8 @@ static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg)
       {
         return -ENOTTY;
       }
-      mCurrentSensor->resolution = arg;
-      setNewResolution(*mCurrentSensor);
+     // mCurrentSensor->resolution = arg;
+     // setNewResolution(*mCurrentSensor);
       break;
     default:
       return -ENOTTY;
@@ -151,16 +182,11 @@ static int init(void)
 {
   unsigned int numberOfSensors = 0;
   int errorCode = 0;
-//  initializeOneWire(mGpioPin);
-//  mSensorsList = newLinkedList();
-//  numberOfSensors = discoverEachSensorID(mSensorsList);
-//  printk(KERN_INFO "Discovered %d sensors", numberOfSensors);
-//  mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, 0);
-//  printk(KERN_ALERT "GETITEMFROMINDEX");
-//  if (mCurrentSensor == NULL)
-//  {
-//    printk(KERN_ALERT "WHY IS THIS NULL MOFO");
-//  }
+  initializeOneWire(mGpioPin);
+  mSensorsList = newLinkedList();
+  numberOfSensors = discoverEachSensorID();
+  printk(KERN_INFO "Discovered %d sensors", numberOfSensors);
+  mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, 0);
 
   /* dynamic allocation for major/minors */
   if (alloc_chrdev_region(&dev, 0, NB_OF_MINORS, "sample") < 0)
@@ -197,8 +223,8 @@ static int init(void)
 
 static void cleanup(void)
 {
-//  deleteBus();
-//  deleteLinkedList(mSensorsList);
+  deleteBus();
+  deleteLinkedList(mSensorsList);
   /* freeing memory and major,(s) */
   unregister_chrdev_region(dev,NB_OF_MINORS);
   if (myDevice != NULL)

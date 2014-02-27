@@ -3,31 +3,6 @@
  */
 #include "SensorOperations.h"
 
-unsigned int discoverEachSensorID(LinkedList* sensorsList)
-{
-  Sensor* currentSensor;
-  SensorID discoveredID;
-  unsigned int numberOfSensors = 0;
-  while (!isEverySensorDiscovered())
-  {
-    logk((KERN_INFO "Sending an initialization sequence...\n"));
-    sendInitializationSequence();
-    writeROMCommand(SEARCH_ROM);
-    performDiscovery(discoveredID);
-
-    currentSensor = kmalloc(GFP_KERNEL, sizeof(Sensor));
-    if (currentSensor == NULL)
-    {
-      printk(KERN_ALERT "ERROR: failed to allocate memory");
-      return 0;
-    }
-    affectSensorID(currentSensor->id, discoveredID);
-    currentSensor->resolution = MAXIMUM;
-    sensorsList->writeItem(sensorsList, currentSensor);
-    numberOfSensors++;
-  }
-  return numberOfSensors;
-}
 
 int sensorRequestTemperature(Sensor sensor)
 {
