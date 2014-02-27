@@ -71,6 +71,11 @@ struct priv_t
 /* dev_t contains major and minor version */
 dev_t dev;
 
+/* device class */
+static struct class* thermClass = NULL;
+
+static struct device* thermDevice = NULL;
+
 /* struct cdev == a Character Device*/
 struct cdev *myDevice;
 
@@ -87,7 +92,7 @@ unsigned int discoverEachSensorID(void)
   while (!isEverySensorDiscovered() && maxRetries > 0)
   {
     logk((KERN_INFO "Sending an initialization sequence...\n"));
-    sendInitializationSequence();
+    while (sendInitializationSequence() < 0); // send an initialization sequence until we get a response
     writeROMCommand(SEARCH_ROM);
     performDiscovery(discoveredID);
 
@@ -106,7 +111,6 @@ unsigned int discoverEachSensorID(void)
   return numberOfSensors;
 }
 
-// TODO change read to current openedSensor
 static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
 {
   int temperature = 0;
@@ -114,7 +118,6 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   int sizeCopiedToUser = 0;
   int nbCharsTemperatureString = 0;
   TemperatureString temperatureString;
-  mCurrentSensor = mSensorsList->getItemFromIndex(mSensorsList, 0);
   logk((KERN_INFO "Read called!\n"));
   temperature = sensorRequestTemperature(*mCurrentSensor);
   nbCharsTemperatureString = temperatureToString(temperatureString, temperature);
@@ -168,8 +171,8 @@ static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg)
       {
         return -ENOTTY;
       }
-     // mCurrentSensor->resolution = arg;
-     // setNewResolution(*mCurrentSensor);
+      mCurrentSensor->resolution = arg;
+      setNewResolution(*mCurrentSensor);
       break;
     default:
       return -ENOTTY;
@@ -218,13 +221,38 @@ static int init(void)
   }
   printk(KERN_INFO "Cdev added");
 
- return(errorCode);
+  /* creation of /dev/ points */
+ thermClass = class_create(THIS_MODULE, "thermAlexMatt");
+ if (IS_ERR(thermClass)) 
+ {
+   printk(KERN_ALERT "failed to register device class\n");
+   goto failed_classreg;
+ }
+
+  thermDevice = device_create(thermClass, NULL, MKDEV(MAJOR(dev), MINOR(dev)), NULL, "thermAlexMatt%d", 0);
+  if (IS_ERR(thermDevice)) {
+    printk(KERN_ALERT "failed to create device");
+    goto failed_devreg;
+  }
+ return 0;
+
+failed_devreg:
+  class_unregister(thermClass);
+  class_destroy(thermClass);
+failed_classreg:
+  unregister_chrdev_region(dev, NB_OF_MINORS);
+  return -1;
 }
 
 static void cleanup(void)
 {
   deleteBus();
   deleteLinkedList(mSensorsList);
+
+  device_destroy(thermClass, MKDEV(MAJOR(dev), MINOR(dev)));
+  class_unregister(thermClass);
+  class_destroy(thermClass);
+  
   /* freeing memory and major,(s) */
   unregister_chrdev_region(dev,NB_OF_MINORS);
   if (myDevice != NULL)
