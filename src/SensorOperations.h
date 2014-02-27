@@ -18,7 +18,7 @@ void blinkGpioLed(void);
 /* read temperature from the sensor */
 int sensorRequestTemperature(Sensor sensor);
 void setNewResolution(Sensor sensor);
-//unsigned int discoverEachSensorID(LinkedList* sensorsList);
+unsigned int discoverEachSensorID(LinkedList* sensorsList);
 void initializeOneWire(int gpioPin);
 
 #endif
