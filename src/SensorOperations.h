@@ -1,6 +1,8 @@
 #ifndef __INC__SENSOROPERATIONS__
 #define __INC__SENSOROPERATIONS__
 
+#include <linux/slab.h>
+
 #include "DiscoveryProtocol.h"
 #include "GlobalData.h"
 #include "OneWire.h"

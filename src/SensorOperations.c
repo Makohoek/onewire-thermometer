@@ -7,8 +7,7 @@ unsigned int discoverEachSensorID(LinkedList* sensorsList)
 {
   Sensor* currentSensor;
   SensorID discoveredID;
-  unsigned int numberOfSensors;
-  numberOfSensors = 0;
+  unsigned int numberOfSensors = 0;
   while (!isEverySensorDiscovered())
   {
     logk((KERN_INFO "Sending an initialization sequence...\n"));
