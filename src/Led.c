@@ -21,7 +21,7 @@ void blinkGpioLed(void)
 void turnLedOn(void)
 {
   int errorOccured;
-  if (! isInitialized)
+  if (!isInitialized)
   {
     logk((KERN_ALERT "[Led]: ERROR led subsystem is not initialized"));
     return;
@@ -38,7 +38,7 @@ void turnLedOn(void)
 void turnLedOff(void)
 {
   int errorOccured;
-  if (! isInitialized)
+  if (!isInitialized)
   {
     logk((KERN_ALERT "[Led]: ERROR led subsystem is not initialized"));
     return;
