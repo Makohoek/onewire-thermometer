@@ -13,7 +13,7 @@
 #include <linux/delay.h>
 #include <linux/types.h>
 
-#include "bitOperations.h"
+#include "BitOperations.h"
 
 void initializeOneWire(int gpioPin);
 

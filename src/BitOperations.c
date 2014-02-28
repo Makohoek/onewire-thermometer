@@ -1,7 +1,7 @@
 /**
  * GPIO management based on http://www.mjmwired.net/kernel/Documentation/gpio.txt
  */
-#include "bitOperations.h"
+#include "BitOperations.h"
 
 /* members */
 static int mGpioPin = -1;

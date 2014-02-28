@@ -3,7 +3,7 @@ KERNEL_DIR=/media/ExtendedLinux/linux-sunxi
 #KERNEL_DIR=/media/a852afe7-e4bb-48b6-a1da-7583947c84d4/sunxi-jorda/linux-sunxi
 ifneq ($(KERNELRELEASE),)
 	obj-m := therm.o
-	therm-objs := char_dev.o bitOperations.o OneWire.o led.o DiscoveryProtocol.o SensorID.o LinkedList.o SensorOperations.o TemperatureScratchpad.o TemperatureResolution.o
+	therm-objs := char_dev.o BitOperations.o OneWire.o Led.o DiscoveryProtocol.o SensorID.o LinkedList.o SensorOperations.o TemperatureScratchpad.o TemperatureResolution.o
 else
 	KERNEL_DIR ?= /lib/modules/$(shell uname -r)/build
 	PWD := $(shell pwd)
@@ -22,12 +22,12 @@ matt:
 	scp -r *.o *.mod.* *.ko *.sh modules.order Module.symvers .*.cmd .tmp_versions root@olinuxino:~/AlexMattijs
 matthome:
 	$(MAKE) ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -Wall -C ${KERNEL_DIR} M=$(PWD) modules
-	scp -r *.o *.mod.* *.ko *.sh modules.order Module.symvers .*.cmd .tmp_versions Makefile testioctl.c testtemperature.c root@192.168.0.1:~/AlexMattijs
+	scp -r *.o *.mod.* *.ko *.sh modules.order Module.symvers .*.cmd .tmp_versions Makefile Tests/ root@192.168.0.1:~/AlexMattijs
 clean:
 	rm -rf *.o *.ko.* *.mod.* *.ko .[a-z] modules.order Module.symvers .*.cmd
 endif
 
-testioctl:
-	gcc -Wall testioctl.c -o testioctl
-testtemperature:
-	gcc -Wall testtemperature.c -o testtemperature
+setResolution:
+	gcc -Wall Tests/SetResolution.c -o setResolution
+getTemperature:
+	gcc -Wall Tests/GetTemperature.c -o getTemperature
