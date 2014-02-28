@@ -31,53 +31,45 @@ digraph hierarchy
     node[shape=record,style=filled,fillcolor="#fdf6e3", fontcolor="#657b83", color="#eee8d5"]
     edge[dir=forward, arrowtail=open, color="#586e75"]
 
-2[label = "{bitOperations||}"]
-3[label = "{char_dev||}"]
-4[label = "{DiscoveryProtocol||}"]
-5[label = "{dmesgLogging||}"]
-6[label = "{GlobalData||}"]
-7[label = "{led||}"]
-8[label = "{LinkedList||}"]
-9[label = "{OneWire||}"]
-10[label = "{SensorID||}"]
-11[label = "{SensorOperations||}"]
-12[label = "{testioctl||}"]
-13[label = "{testtemperature||}"]
-14[label = "{thermOperations||}"]
+2[label = "{BitOperations|}"]
+3[label = "{DiscoveryProtocol|}"]
+4[label = "{GlobalData|}"]
+5[label = "{Klogger|}"]
+6[label = "{Led|}"]
+7[label = "{LinkedList|}"]
+8[label = "{OneWire|}"]
+9[label = "{SensorID|}"]
+10[label = "{SensorOperations|}"]
+11[label = "{TemperatureResolution|}"]
+12[label = "{TemperatureScratchpad|}"]
+13[label = "{char_dev|}"]
 
 /* bitoperations */
+2->4
 2->5
-2->6
-/* OneWire */
-9->5
-9->6
-9->2
-/* led */
-7->5
-/* sensorID */
-10->6
-10->9
-10->5
 /* Discovery */
-4->5
-4->6
-4->9
-4->10
+3->9
+/* GlobalData */
+/* Klogger */
+/* Led */
+6->5
 /* LinkedList */
-8->10
-8->6
-/* thermOperations */
-14->9
-14->10
-14->5
-14->6
-
-
+7->9
+/* OneWire */
+8->2
+/* SensorID */
+9->8
+/* SensorOperations */
+10->6
+10->3
+10->7
+10->11
+10->12
+/* TempResolution */
+11->5
+11->4
+/* TempScratchpad */
+12->8
 /* char_dev */
-
-   /* 2->4
-    5->5[constraint=false]
-    4->3[constraint=false]
-    2->5[constraint=false]
-    5->6[arrowtail=open]*/
+13->10
 }
