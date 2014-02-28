@@ -1,3 +1,14 @@
+/**
+ * Klogger
+ *
+ * conditional kernel logging for more
+ * efficient debugging
+ *
+ * Mattijs Korpershoek
+ * <mattijs.korpershoek@gmail.com>
+ * Alexandre Montilla
+ * <alexandre.montilla@gmail.com>
+ */
 #ifndef __INC_DMESGLOGGING__
 #define __INC_DMESGLOGGING__
 

@@ -1,13 +1,3 @@
-/**
- * Handles the different one-wire timings
- * in order to communicate properly with the
- * Maxim DS18B2
- * 
- * Mattijs Korpershoek
- * <mattijs.korpershoek@gmail.com>
- * Alexandre Montilla
- * <alexandre.montilla@gmail.com>
- */
 #include "OneWire.h"
 
 static unsigned long interruptFlags;

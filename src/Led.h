@@ -1,5 +1,5 @@
-/*
- * led
+/**
+ * Led
  * 
  * Led module for the OlinuXinO board
  * Can be used to test if gpio communication is working correctly

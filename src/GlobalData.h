@@ -1,3 +1,14 @@
+/**
+ * GlobalData
+ *
+ * All the interfaces used
+ * to communicate between functions
+ *
+ * Mattijs Korpershoek
+ * <mattijs.korpershoek@gmail.com>
+ * Alexandre Montilla
+ * <alexandre.montilla@gmail.com>
+ */
 #ifndef __INC_GLOBALDATA__
 #define __INC_GLOBALDATA__
 

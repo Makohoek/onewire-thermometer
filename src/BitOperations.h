@@ -1,6 +1,6 @@
-/*
+/**
  * BitOperations
- * 
+ *
  * Interface to the GPIO
  * Read linux-sunxi/Documentation/gpio.txt for more information
  *

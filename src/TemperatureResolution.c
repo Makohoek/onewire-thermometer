@@ -39,4 +39,3 @@ static u8 getConfigurationByteFromResolution(TemperatureResolution resolution)
   }
   return 0b01111111; // return default configuration if false resolution is given
 }
-

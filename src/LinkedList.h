@@ -1,8 +1,8 @@
 /**
  * LinkedList.h
  *
- *	Mattijs KORPERSHOEK
- *	<mattijs.korpershoek@gmail.com>
+ * Mattijs KORPERSHOEK
+ * <mattijs.korpershoek@gmail.com>
  */
 #ifndef __DEFINE_LINKEDLISTLINKEDLIST__
 #define __DEFINE_LINKEDLISTLINKEDLIST__
@@ -20,7 +20,6 @@
 #include <linux/kdev_t.h>
 #include <linux/fs.h>
 #include <linux/slab.h>
-#include "GlobalData.h"
 #include "SensorID.h"
 
 #define FREE kfree

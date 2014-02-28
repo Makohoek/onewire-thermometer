@@ -1,3 +1,14 @@
+/**
+ * TemperatureScratchpad
+ *
+ * Handles temperature receiving,
+ * conversion and scratchpad read/write
+ *
+ * Mattijs Korpershoek
+ * <mattijs.korpershoek@gmail.com>
+ * Alexandre Montilla
+ * <alexandre.montilla@gmail.com>
+ */
 #ifndef TEMPERATURESCRATCHPAD_H_RBATPHRG
 #define TEMPERATURESCRATCHPAD_H_RBATPHRG
 
@@ -5,7 +16,6 @@
 #include <linux/types.h>
 
 #include "OneWire.h"
-#include "SensorID.h"
 
 #define MAX_CHARS_TEMPERATURE 14 // max precision = 12, one char for '.' and one for '\0'
 typedef char TemperatureString[MAX_CHARS_TEMPERATURE];

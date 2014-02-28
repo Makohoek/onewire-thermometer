@@ -1,3 +1,15 @@
+/**
+ * SensorID
+ *
+ * Implements high level functions related to
+ * the functionalities expected by the driver
+ * (read temperature and setresolution)
+ *
+ * Mattijs Korpershoek
+ * <mattijs.korpershoek@gmail.com>
+ * Alexandre Montilla
+ * <alexandre.montilla@gmail.com>
+ */
 #ifndef __INC__SENSOROPERATIONS__
 #define __INC__SENSOROPERATIONS__
 

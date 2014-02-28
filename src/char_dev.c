@@ -1,4 +1,8 @@
 /**
+ * char_dev
+ *
+ * The main character device driver
+ *
  * Mattijs Korpershoek
  * <mattijs.korpershoek@gmail.com>
  * Alexandre Montilla

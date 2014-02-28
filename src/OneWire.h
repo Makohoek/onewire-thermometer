@@ -1,10 +1,14 @@
-/*
- * Handles the different timings
- * order to communicate properly with the
+/**
+ * OneWire
+ *
+ * Handles the different one-wire timings
+ * in order to communicate properly with the
  * Maxim DS18B2
  *
  * Mattijs Korpershoek
  * <mattijs.korpershoek@gmail.com>
+ * Alexandre Montilla
+ * <alexandre.montilla@gmail.com>
  */
 #ifndef __INC_ONEWIRE__
 #define __INC_ONEWIRE__
