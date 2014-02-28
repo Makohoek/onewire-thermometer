@@ -39,12 +39,20 @@ void changeResolution(const char* filename , TemperatureResolution resolution);
 
 int main(int argc, const char *argv[])
 {
-  if (argc != 2)
+  int resolution;
+  if (argc != 3)
   {
-    fprintf(stderr, "Usage: %s filename\n", argv[0]);
+    fprintf(stderr, "Usage: %s device resolution\n", argv[0]);
     return EXIT_FAILURE;
   }
-  changeResolution(argv[1], MINIMUM);
+  resolution = atoi(argv[2]);
+  if (resolution < MINIMUM || resolution > MAXIMUM)
+  {
+    fprintf(stderr, "Error resolution(%d) must be between %d and %d\n", resolution, MINIMUM, MAXIMUM);
+    return EXIT_FAILURE;
+  }
+
+  changeResolution(argv[1], resolution);
   return EXIT_SUCCESS;
 }
 
