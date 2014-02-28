@@ -11,12 +11,26 @@
 #include "OneWire.h"
 
 static unsigned long interruptFlags;
-static void OneWireWriteOneSlot( void );
-static void OneWireWriteZeroSlot( void );
+static void OneWireWriteOneSlot(void);
+static void OneWireWriteZeroSlot(void);
 static void disableInterruptions(void);
 static void enableInterruptions(void);
 
-int sendInitializationSequence( void )
+void initializeOneWire(int gpioPin)
+{
+  /* displays GPIO port */
+  logk((KERN_INFO "gpioPin=%d\n", gpioPin));
+  if (initializeBus(gpioPin))
+  {
+    logk((KERN_INFO "Gpio initialized"));
+  }
+  else
+  {
+    logk((KERN_ALERT "ERROR while calling initializeGPIO"));
+  }
+}
+
+int sendInitializationSequence(void)
 {
   Bit presencePulse, inactiveBus;
   /* generate a reset pulse */
@@ -44,7 +58,7 @@ int sendInitializationSequence( void )
 void OneWireWriteByte(u8 byteToWrite)
 {
   int i;
-  for ( i = 0; i < 8; i++ )
+  for ( i = 0; i < 8; ++i )
   {
     Bit bitToWrite = intToBit((byteToWrite >> i) & 0x1);
     OneWireWriteBit(bitToWrite);
@@ -53,12 +67,12 @@ void OneWireWriteByte(u8 byteToWrite)
   }
 }
 
-u8 OneWireReadByte( void )
+u8 OneWireReadByte(void)
 {
   int i;
   Bit readedBit;
   u8 result = 0;
-  for ( i = 0; i < 8; i++ )
+  for ( i = 0; i < 8; ++i )
   {
     readedBit = OneWireReadBit();
     result |= BitToInt(readedBit) << i;
@@ -67,7 +81,7 @@ u8 OneWireReadByte( void )
   return (result);
 }
 
-static void OneWireWriteOneSlot( void )
+static void OneWireWriteOneSlot(void)
 {
   disableInterruptions();
   pullBusLow();
@@ -77,7 +91,7 @@ static void OneWireWriteOneSlot( void )
   enableInterruptions();
 }
 
-static void OneWireWriteZeroSlot( void )
+static void OneWireWriteZeroSlot(void)
 {
   disableInterruptions();
   pullBusLow();
@@ -91,7 +105,7 @@ static void OneWireWriteZeroSlot( void )
  * Note: MUST be called after
  * a Read Command such as read scratchpad, for example
  */
-Bit OneWireReadBit( void )
+Bit OneWireReadBit(void)
 {
   Bit result;
   disableInterruptions();
@@ -105,7 +119,7 @@ Bit OneWireReadBit( void )
   return result;
 }
 
-void OneWireWriteBit( Bit bitToWrite )
+void OneWireWriteBit(Bit bitToWrite)
 {
   if ( bitToWrite == ONE )
   {

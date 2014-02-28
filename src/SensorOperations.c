@@ -79,20 +79,6 @@ void sensorSetNewResolution(Sensor sensor)
   writeScratchpad(scratchpadData);
 }
 
-void initializeOneWire(int gpioPin)
-{
-  /* displays GPIO port */
-  logk((KERN_INFO "gpioPin=%d\n", gpioPin));
-  if (initializeBus(gpioPin))
-  {
-    logk((KERN_INFO "Gpio initialized"));
-  }
-  else
-  {
-    logk((KERN_ALERT "ERROR while calling initializeGPIO"));
-  }
-}
-
 static void writeFunctionCommand(FunctionCommand functionCommand)
 {
   OneWireWriteByte(functionCommand);

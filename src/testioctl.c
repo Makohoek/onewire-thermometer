@@ -35,7 +35,7 @@ typedef enum
 } TemperatureResolution;
 
 static inline void assertOnPosixError(int value);
-void changeResolution( const char* filename , TemperatureResolution resolution);
+void changeResolution(const char* filename , TemperatureResolution resolution);
 
 int main(int argc, const char *argv[])
 {
@@ -48,7 +48,7 @@ int main(int argc, const char *argv[])
   return EXIT_SUCCESS;
 }
 
-void changeResolution( const char* filename , TemperatureResolution resolution)
+void changeResolution(const char* filename , TemperatureResolution resolution)
 {
   int fd;
   printf("Performing THERM_IOCTL_RESOLUTION on %s\n", filename);

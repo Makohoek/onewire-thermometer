@@ -17,12 +17,14 @@
 #include "bitOperations.h"
 #include "Klogger.h"
 
-int sendInitializationSequence( void );
+void initializeOneWire(int gpioPin);
 
-void OneWireWriteBit( Bit bitToWrite );
-Bit OneWireReadBit( void );
+int sendInitializationSequence(void);
 
-void OneWireWriteByte( u8 byteToWrite );
-u8 OneWireReadByte( void );
+void OneWireWriteBit(Bit bitToWrite);
+Bit OneWireReadBit(void);
+
+void OneWireWriteByte(u8 byteToWrite);
+u8 OneWireReadByte(void);
 
 #endif /* end of include guard: __INC_ONEWIRE__ */

@@ -188,7 +188,7 @@ static int init(void)
   }
   logk((KERN_INFO "thermClass added!"));
 
-  for (i = 0; i < mNbOfMinors; ++i)
+  for ( i = 0; i < mNbOfMinors; ++i )
   {
     struct device* thermDevice = device_create(thermClass, NULL, MKDEV(MAJOR(dev), MINOR(dev)+i), NULL, "thermAlexMatt%d", i);
     if (IS_ERR(thermDevice))
@@ -214,7 +214,7 @@ static void cleanup(void)
   deleteBus();
   deleteLinkedList(mSensorsList);
 
-  for (i = 0; i < mNbOfMinors; ++i)
+  for ( i = 0; i < mNbOfMinors; ++i )
   {
     device_destroy(thermClass, MKDEV(MAJOR(dev), MINOR(dev)+i));
   }

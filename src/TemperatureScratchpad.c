@@ -44,11 +44,11 @@ void waitForConversionDone(void)
 void readScratchpad(Scratchpad readedScratchpad)
 {
   int i;
-  for ( i = 0; i < 9; i++ )
+  for ( i = 0; i < 9; ++i )
   {
     readedScratchpad[i] = OneWireReadByte();
   }
-  for ( i = 0; i < 9; i++ )
+  for ( i = 0; i < 9; ++i )
   {
     logk((KERN_INFO "readScratchpad(%d): received %2x", i, readedScratchpad[i]));
   }
@@ -61,11 +61,11 @@ void readScratchpad(Scratchpad readedScratchpad)
 void writeScratchpad(Scratchpad scratchpad)
 {
   int i;
-  for ( i = 2; i < 5; i++ )
+  for ( i = 2; i < 5; ++i )
   {
     OneWireWriteByte(scratchpad[i]);
   }
-  for ( i = 2; i < 5; i++ )
+  for ( i = 2; i < 5; ++i )
   {
     logk((KERN_INFO "writeScratchpad(%d): send %2x",i , scratchpad[i]));
   }

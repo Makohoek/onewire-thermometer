@@ -19,10 +19,10 @@
 
 void blinkGpioLed(void);
 
-void turnLedOn( void );
-void turnLedOff( void );
+void turnLedOn(void);
+void turnLedOff(void);
 
-int initializeLed( void );
-void freeLed( void );
+int initializeLed(void);
+void freeLed(void);
 
 #endif /* end of include guard: __INC_LEDOPERATION__ */

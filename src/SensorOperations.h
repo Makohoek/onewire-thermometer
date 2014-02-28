@@ -19,6 +19,5 @@
 int sensorRequestTemperature(Sensor sensor);
 void sensorSetNewResolution(Sensor sensor);
 unsigned int discoverEachSensorID(LinkedList* sensorsList);
-void initializeOneWire(int gpioPin);
 
 #endif

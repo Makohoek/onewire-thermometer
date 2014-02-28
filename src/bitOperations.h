@@ -18,12 +18,12 @@
 #include "Klogger.h"
 #include "GlobalData.h"
 
-int initializeBus( int GpioPin );
-void deleteBus( void );
+int initializeBus(int GpioPin);
+void deleteBus(void);
 
-void pullBusLow( void );
-void releaseBus( void );
-Bit readBus( void );
+void pullBusLow(void);
+void releaseBus(void);
+Bit readBus(void);
 
 int BitToInt(Bit myBit);
 Bit intToBit(int myInt);

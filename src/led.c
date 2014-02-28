@@ -8,7 +8,7 @@ void blinkGpioLed(void)
   int i;
   initializeLed();
   logk((KERN_INFO "Blinking led 3 times\n"));
-  for ( i = 0; i < 3; i++ )
+  for ( i = 0; i < 3; ++i )
   {
     turnLedOn();
     msleep(1000);
@@ -18,7 +18,7 @@ void blinkGpioLed(void)
   freeLed();
 }
 
-void turnLedOn( void )
+void turnLedOn(void)
 {
   int errorOccured;
   if (! isInitialized)
@@ -35,7 +35,7 @@ void turnLedOn( void )
   gpio_set_value(mLedPin, 1);
 }
 
-void turnLedOff( void )
+void turnLedOff(void)
 {
   int errorOccured;
   if (! isInitialized)
@@ -50,7 +50,7 @@ void turnLedOff( void )
   }
 }
 
-int initializeLed( void )
+int initializeLed(void)
 {
   int errorOccured;
   if (!gpio_is_valid(mLedPin))
@@ -66,7 +66,7 @@ int initializeLed( void )
   return 0;
 }
 
-void freeLed( void )
+void freeLed(void)
 {
   if (isInitialized)
   {

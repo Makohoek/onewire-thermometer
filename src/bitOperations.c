@@ -7,30 +7,30 @@
 static int mGpioPin = -1;
 
 /* methods */
-static void assertPinIsValid( void );
+static void assertPinIsValid(void);
 
 static int outputGpio(Bit initialBit);
-static int inputGpio( void );
-static void writeGpio( Bit bitToWrite );
-static Bit readGpio( void );
+static int inputGpio(void);
+static void writeGpio(Bit bitToWrite);
+static Bit readGpio(void);
 
-void pullBusLow( void )
+void pullBusLow(void)
 {
   outputGpio(ZERO);
   writeGpio(ZERO);
 }
 
-void releaseBus( void )
+void releaseBus(void)
 {
   inputGpio();
 }
 
-Bit readBus( void )
+Bit readBus(void)
 {
   return readGpio();
 }
 
-static void writeGpio( Bit bitToWrite )
+static void writeGpio(Bit bitToWrite)
 {
   int bit;
   assertPinIsValid();
@@ -47,11 +47,11 @@ static int outputGpio(Bit initialBit) // takes an argument to avoid bit glitchin
   return errorOccured;
 }
 
-static int inputGpio( void )
+static int inputGpio(void)
 {
   int errorOccured;
   assertPinIsValid();
-  errorOccured = gpio_direction_input( mGpioPin );
+  errorOccured = gpio_direction_input(mGpioPin);
   if (errorOccured)
   {
     logk((KERN_ALERT "Error when setting %d pin to input\n", mGpioPin));
@@ -59,11 +59,11 @@ static int inputGpio( void )
   return errorOccured;
 }
 
-Bit readGpio( void )
+Bit readGpio(void)
 {
   int bit;
   assertPinIsValid();
-  bit = gpio_get_value( mGpioPin );
+  bit = gpio_get_value(mGpioPin);
   return (intToBit(bit));
 }
 
@@ -77,7 +77,7 @@ Bit intToBit(int myInt)
   return (myInt == 0) ? ZERO : ONE;
 }
 
-static void assertPinIsValid( void )
+static void assertPinIsValid(void)
 {
   if (mGpioPin == -1 || !gpio_is_valid(mGpioPin))
   {
@@ -85,7 +85,7 @@ static void assertPinIsValid( void )
   }
 }
 
-int initializeBus( int GpioPin )
+int initializeBus(int GpioPin)
 {
   int errorOccured;
   mGpioPin = GpioPin;
@@ -104,7 +104,7 @@ int initializeBus( int GpioPin )
   return (errorOccured);
 }
 
-void deleteBus( void )
+void deleteBus(void)
 {
   gpio_free(mGpioPin);
 }

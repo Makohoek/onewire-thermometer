@@ -6,7 +6,7 @@
 #include "SensorID.h"
 #include "Klogger.h"
 
-int performDiscovery( SensorID discoveredSensorID );
+int performDiscovery(SensorID discoveredSensorID);
 Bool isEverySensorDiscovered(void);
 
 #endif /* end of include guard: __INC_DISCOVERYPROTOCOL__ */

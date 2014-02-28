@@ -10,7 +10,7 @@ void writeSensorID(SensorID sensorID)
   int i;
   const int numberOfBytes = 64/8; // 64 bits, we send 8 bytes to transfer whole sensor id
   u8 byteToSend;
-  for (i = 0; i < numberOfBytes; i++)
+  for ( i = 0; i < numberOfBytes; ++i )
   {
     byteToSend = getByte(sensorID, i);
     OneWireWriteByte(byteToSend);
@@ -28,7 +28,7 @@ static u8 getByte(SensorID sensorID, int whichByte)
   startIndex = (whichByte+1)*8-1;
   endIndex = 8*whichByte;
   logk((KERN_INFO "getByte(%d): looping from %d -> %d", whichByte, startIndex, endIndex));
-  for (i = startIndex; i >= endIndex ; i--)
+  for ( i = startIndex; i >= endIndex ; i--)
   {
     logk((KERN_INFO "Sensor(%d): %d", i, sensorID[i]));
     res |= (sensorID[i] << (shift--));
@@ -39,7 +39,7 @@ static u8 getByte(SensorID sensorID, int whichByte)
 void affectSensorID(SensorID destination, SensorID source)
 {
   int i;
-  for (i = 0; i < 64; ++i)
+  for ( i = 0; i < 64; ++i )
   {
     destination[i] = source[i];
   }
@@ -48,7 +48,7 @@ void affectSensorID(SensorID destination, SensorID source)
 void printSensorID(SensorID sensorID)
 {
   int i;
-  for (i = 0; i < 64; i+=8)
+  for ( i = 0; i < 64; i+=8 )
   {
     printk(KERN_INFO "%d%d%d%d %d%d%d%d", sensorID[i],
         sensorID[i+1],

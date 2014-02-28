@@ -10,12 +10,12 @@ static Bool isHighestUnknownBit(int currentBitIndex);
  * discovery process of the sensors IDs.
  * Should be called after a SEARCH_ROM Command
  */
-int performDiscovery( SensorID discoveredSensorID )
+int performDiscovery(SensorID discoveredSensorID)
 {
   int i;
   Bit responseBit, bit, complementaryBit;
   logk((KERN_INFO "Discovery protocol: started\n"));
-  for ( i = 0; i < 64; i++ )
+  for ( i = 0; i < 64; ++i )
   {
     responseBit = ZERO;
     bit = OneWireReadBit();
@@ -66,7 +66,7 @@ int performDiscovery( SensorID discoveredSensorID )
 Bool isEverySensorDiscovered(void)
 {
   int i;
-  for (i = 0; i < 64; ++i)
+  for ( i = 0; i < 64; ++i )
   {
     if (mExploredBits[i] == FALSE)
     {
@@ -80,7 +80,7 @@ static Bool isHighestUnknownBit(int currentBitIndex)
 {
   int i;
   unsigned char result = TRUE;
-  for (i = currentBitIndex+1; i < 64-currentBitIndex; ++i)
+  for ( i = currentBitIndex+1; i < 64-currentBitIndex; ++i )
   {
     if (mExploredBits[i] == FALSE)
     {

@@ -78,7 +78,7 @@ ITEM_TYPE_LL getItemFromIndex(LinkedList* theLinkedListToRead, unsigned int inde
       return currentCell->item;
     }
     currentCell = currentCell->next;
-    i++;
+    ++i;
   }
   PRINT("ERROR: no item with this index");
   return DEFAULT_ITEM;
