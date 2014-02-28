@@ -1,0 +1,83 @@
+/**
+ * Class diagram with solarized light colorscheme
+ * Example found on http://fsteeg.com/2006/11/17/uml-class-diagrams-with-graphviz/
+ *
+ * Colors added by Mattijs Korpershoek
+ * <mattijs.korpershoek@gmail.com>
+ */
+
+/*
+ * Solarized colorscheme:
+ * $base03:    #002b36;
+ * $base02:    #073642;
+ * $base01:    #586e75;
+ * $base00:    #657b83;
+ * $base0:     #839496;
+ * $base1:     #93a1a1;
+ * $base2:     #eee8d5;
+ * $base3:     #fdf6e3;
+ * $yellow:    #b58900;
+ * $orange:    #cb4b16;
+ * $red:       #dc322f;
+ * $magenta:   #d33682;
+ * $violet:    #6c71c4;
+ * $blue:      #268bd2;
+ * $cyan:      #2aa198;
+ * $green:     #859900;
+ * */
+digraph hierarchy 
+{
+  size="15,15"
+    node[shape=record,style=filled,fillcolor="#fdf6e3", fontcolor="#657b83", color="#eee8d5"]
+    edge[dir=forward, arrowtail=open, color="#586e75"]
+
+2[label = "{bitOperations||}"]
+3[label = "{char_dev||}"]
+4[label = "{DiscoveryProtocol||}"]
+5[label = "{dmesgLogging||}"]
+6[label = "{GlobalData||}"]
+7[label = "{led||}"]
+8[label = "{LinkedList||}"]
+9[label = "{OneWire||}"]
+10[label = "{SensorID||}"]
+11[label = "{SensorOperations||}"]
+12[label = "{testioctl||}"]
+13[label = "{testtemperature||}"]
+14[label = "{thermOperations||}"]
+
+/* bitoperations */
+2->5
+2->6
+/* OneWire */
+9->5
+9->6
+9->2
+/* led */
+7->5
+/* sensorID */
+10->6
+10->9
+10->5
+/* Discovery */
+4->5
+4->6
+4->9
+4->10
+/* LinkedList */
+8->10
+8->6
+/* thermOperations */
+14->9
+14->10
+14->5
+14->6
+
+
+/* char_dev */
+
+   /* 2->4
+    5->5[constraint=false]
+    4->3[constraint=false]
+    2->5[constraint=false]
+    5->6[arrowtail=open]*/
+}
