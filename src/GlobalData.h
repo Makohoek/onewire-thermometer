@@ -1,6 +1,8 @@
 #ifndef __INC_GLOBALDATA__
 #define __INC_GLOBALDATA__
 
+#include <linux/types.h>
+
 typedef enum
 {
   FALSE=0,
@@ -28,6 +30,8 @@ typedef enum
   ZERO = 0,
   ONE = 1
 } Bit;
+
+typedef u8 Scratchpad[9];
 
 typedef Bit SensorID[64];
 

@@ -25,9 +25,9 @@
 #include "OneWire.h"
 #include "SensorID.h"
 #include "bitOperations.h"
-#include "dmesgLogging.h"
+#include "Klogger.h"
 #include "led.h"
-#include "thermOperations.h"
+
 #include "LinkedList.h"
 #include "SensorOperations.h"
 
@@ -94,7 +94,7 @@ static ssize_t read(struct file *f, char *buf, size_t size, loff_t *offset)
   return sizeCopiedToUser;
 }
 
-// change open based on them sensors
+// change open based on the sensors
 static int open(struct inode *in, struct file *f)
 {
   int errorCode = 0;
@@ -128,7 +128,7 @@ static long ioctlTermDriver(struct file *f, unsigned int cmd, unsigned long arg)
         return -ENOTTY;
       }
       mCurrentSensor->resolution = arg;
-      setNewResolution(*mCurrentSensor);
+      sensorSetNewResolution(*mCurrentSensor);
       break;
     default:
       return -ENOTTY;

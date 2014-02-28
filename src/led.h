@@ -12,8 +12,12 @@
 #ifndef __INC_LEDOPERATION__
 #define __INC_LEDOPERATION__
 
+#include <linux/delay.h>
 #include <linux/gpio.h>
-#include "dmesgLogging.h"
+
+#include "Klogger.h"
+
+void blinkGpioLed(void);
 
 void turnLedOn( void );
 void turnLedOff( void );

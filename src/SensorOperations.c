@@ -2,6 +2,8 @@
  * This handles all the high level logic based on the operations we want to do
  */
 #include "SensorOperations.h"
+static void writeFunctionCommand(FunctionCommand command);
+static void writeROMCommand(ROMCommand romcommand);
 
 unsigned int discoverEachSensorID(LinkedList* sensorsList)
 {
@@ -52,9 +54,6 @@ int sensorRequestTemperature(Sensor sensor)
   freeLed();
 
   /* READ_SCRATCHPAD */
-  logk((KERN_INFO "Send match rom to this ID:"));
-  printSensorID(sensor.id);
-
   sendInitializationSequence();
   writeROMCommand(MATCH_ROM);
   writeSensorID(sensor.id);
@@ -66,7 +65,7 @@ int sensorRequestTemperature(Sensor sensor)
   return temperature;
 }
 
-void setNewResolution(Sensor sensor)
+void sensorSetNewResolution(Sensor sensor)
 {
   Scratchpad scratchpadData;
   buildScratchpadNewResolution(scratchpadData, sensor.resolution);
@@ -78,21 +77,6 @@ void setNewResolution(Sensor sensor)
   writeSensorID(sensor.id);
   writeFunctionCommand(WRITE_SCRATCHPAD);
   writeScratchpad(scratchpadData);
-}
-
-void blinkGpioLed(void)
-{
-  int i;
-  initializeLed();
-  logk((KERN_INFO "Blinking led 3 times\n"));
-  for ( i = 0; i < 3; i++ )
-  {
-    turnLedOn();
-    msleep(1000);
-    turnLedOff();
-    msleep(1000);
-  }
-  freeLed();
 }
 
 void initializeOneWire(int gpioPin)
@@ -107,4 +91,14 @@ void initializeOneWire(int gpioPin)
   {
     logk((KERN_ALERT "ERROR while calling initializeGPIO"));
   }
+}
+
+static void writeFunctionCommand(FunctionCommand functionCommand)
+{
+  OneWireWriteByte(functionCommand);
+}
+
+static void writeROMCommand(ROMCommand romCommand)
+{
+  OneWireWriteByte(romCommand);
 }

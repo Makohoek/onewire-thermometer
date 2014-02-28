@@ -3,6 +3,21 @@
 static const unsigned int mLedPin = 12;
 static unsigned char isInitialized = 0;
 
+void blinkGpioLed(void)
+{
+  int i;
+  initializeLed();
+  logk((KERN_INFO "Blinking led 3 times\n"));
+  for ( i = 0; i < 3; i++ )
+  {
+    turnLedOn();
+    msleep(1000);
+    turnLedOff();
+    msleep(1000);
+  }
+  freeLed();
+}
+
 void turnLedOn( void )
 {
   int errorOccured;

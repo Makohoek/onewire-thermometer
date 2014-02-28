@@ -8,16 +8,16 @@
 #include "OneWire.h"
 #include "SensorID.h"
 #include "bitOperations.h"
-#include "dmesgLogging.h"
+#include "Klogger.h"
 #include "led.h"
-#include "thermOperations.h"
+
+#include "TemperatureScratchpad.h"
+#include "TemperatureResolution.h"
 #include "LinkedList.h"
 
-/* led blinking for fun-only part */
-void blinkGpioLed(void);
 /* read temperature from the sensor */
 int sensorRequestTemperature(Sensor sensor);
-void setNewResolution(Sensor sensor);
+void sensorSetNewResolution(Sensor sensor);
 unsigned int discoverEachSensorID(LinkedList* sensorsList);
 void initializeOneWire(int gpioPin);
 

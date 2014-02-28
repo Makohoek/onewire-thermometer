@@ -1,7 +1,7 @@
 /*
  * bitOperations
  * 
- * Interface to the GPIO 
+ * Interface to the GPIO
  * Read linux-sunxi/Documentation/gpio.txt for more information
  *
  * Interface can be found here: linux-sunx/drivers/gpio/gpio-sunxi.{c, h}
@@ -15,7 +15,7 @@
 #define __INC_BITOPERATIONS__
 
 #include <linux/gpio.h>
-#include "dmesgLogging.h"
+#include "Klogger.h"
 #include "GlobalData.h"
 
 int initializeBus( int GpioPin );

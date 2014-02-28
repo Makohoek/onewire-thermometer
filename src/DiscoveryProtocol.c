@@ -99,4 +99,3 @@ static int isBitIdONE(Bit bit, Bit complementaryBit)
 {
   return (ONE == bit && ZERO == complementaryBit);
 }
-

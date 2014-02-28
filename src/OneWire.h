@@ -15,7 +15,7 @@
 
 #include "GlobalData.h"
 #include "bitOperations.h"
-#include "dmesgLogging.h"
+#include "Klogger.h"
 
 int sendInitializationSequence( void );
 

@@ -4,7 +4,7 @@
 #include "GlobalData.h"
 #include "OneWire.h"
 #include "SensorID.h"
-#include "dmesgLogging.h"
+#include "Klogger.h"
 
 int performDiscovery( SensorID discoveredSensorID );
 Bool isEverySensorDiscovered(void);

@@ -3,7 +3,7 @@
 
 #include <linux/kernel.h>
 
-#include "dmesgLogging.h"
+#include "Klogger.h"
 #include "GlobalData.h"
 #include "OneWire.h"
 
