@@ -15,8 +15,9 @@
 #define __INC_BITOPERATIONS__
 
 #include <linux/gpio.h>
-#include "Klogger.h"
+
 #include "GlobalData.h"
+#include "Klogger.h"
 
 int initializeBus(int GpioPin);
 void deleteBus(void);

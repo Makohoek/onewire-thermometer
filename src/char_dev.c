@@ -6,9 +6,10 @@
  */
 #include <asm/uaccess.h>
 #include <linux/cdev.h>
-#include <linux/device.h>
 #include <linux/delay.h>
+#include <linux/device.h>
 #include <linux/fs.h>
+#include <linux/gfp.h>
 #include <linux/init.h>
 #include <linux/ioctl.h>
 #include <linux/kdev_t.h>
@@ -16,19 +17,9 @@
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/sched.h>
-#include <linux/types.h>
 #include <linux/slab.h>
-#include <linux/gfp.h>
+#include <linux/types.h>
 
-#include "DiscoveryProtocol.h"
-#include "GlobalData.h"
-#include "OneWire.h"
-#include "SensorID.h"
-#include "bitOperations.h"
-#include "Klogger.h"
-#include "led.h"
-
-#include "LinkedList.h"
 #include "SensorOperations.h"
 
 /* minor aliases */

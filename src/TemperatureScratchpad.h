@@ -1,15 +1,11 @@
 #ifndef TEMPERATURESCRATCHPAD_H_RBATPHRG
 #define TEMPERATURESCRATCHPAD_H_RBATPHRG
 
+#include <linux/string.h>
 #include <linux/types.h>
-#include <linux/module.h>
-#include <linux/moduleparam.h>
-#include <linux/kernel.h>
 
 #include "OneWire.h"
 #include "SensorID.h"
-#include "Klogger.h"
-#include "GlobalData.h"
 
 #define MAX_CHARS_TEMPERATURE 14 // max precision = 12, one char for '.' and one for '\0'
 typedef char TemperatureString[MAX_CHARS_TEMPERATURE];

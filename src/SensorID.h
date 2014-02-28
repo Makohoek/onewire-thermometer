@@ -3,8 +3,6 @@
 
 #include <linux/kernel.h>
 
-#include "Klogger.h"
-#include "GlobalData.h"
 #include "OneWire.h"
 
 void writeSensorID(SensorID sensorID);

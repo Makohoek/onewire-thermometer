@@ -3,17 +3,11 @@
 
 #include <linux/slab.h>
 
+#include "Led.h"
 #include "DiscoveryProtocol.h"
-#include "GlobalData.h"
-#include "OneWire.h"
-#include "SensorID.h"
-#include "bitOperations.h"
-#include "Klogger.h"
-#include "led.h"
-
-#include "TemperatureScratchpad.h"
-#include "TemperatureResolution.h"
 #include "LinkedList.h"
+#include "TemperatureResolution.h"
+#include "TemperatureScratchpad.h"
 
 /* read temperature from the sensor */
 int sensorRequestTemperature(Sensor sensor);

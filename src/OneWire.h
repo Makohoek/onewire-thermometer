@@ -9,13 +9,11 @@
 #ifndef __INC_ONEWIRE__
 #define __INC_ONEWIRE__
 
-#include <linux/types.h> 
-#include <linux/delay.h>
 #include <asm/system.h> // for disable interruptions
+#include <linux/delay.h>
+#include <linux/types.h>
 
-#include "GlobalData.h"
 #include "bitOperations.h"
-#include "Klogger.h"
 
 void initializeOneWire(int gpioPin);
 
