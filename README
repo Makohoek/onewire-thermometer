@@ -1,0 +1,22 @@
+####################################
+# Mattijs Korpershoek              #
+# <mattijs.korpershoek@gmail.com>  #
+# Alexandre Montilla               #
+# <alexandre.montilla@gmail.com>   #
+####################################
+
+Liste des dossiers:
+ClassDiagram
+      contient un diagramme représentation les liens d'inclusion des différentes sources.
+dataPlots
+      contient quelques graphiques avec des données mesurées en fonction de la précision.
+doc
+      contient la documentation que nous avons utilisés pour réaliser ce driver.
+exampleCode
+      contient le code d'exemple sur lequel nous nous sommes basés
+      (en particulier pour les timings du protocole One-Wire)
+scripts
+      contient les procédé de compilation de GCC ainsi que la compilation du noyau
+      sunxi utilisé sur la carte
+src
+      contient l'ensemble des fichiers sources du driver
