@@ -1,5 +1,5 @@
-KERNEL_DIR=/media/storage/linux-sunxi/
-#KERNEL_DIR=/media/ExtendedLinux/linux-sunxi
+#KERNEL_DIR=/media/storage/linux-sunxi/
+KERNEL_DIR=/media/ExtendedLinux/linux-sunxi
 #KERNEL_DIR=/media/a852afe7-e4bb-48b6-a1da-7583947c84d4/sunxi-jorda/linux-sunxi
 ifneq ($(KERNELRELEASE),)
 	obj-m := therm.o

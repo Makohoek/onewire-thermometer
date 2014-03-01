@@ -23,10 +23,10 @@ void initializeOneWire(int gpioPin);
 
 int sendInitializationSequence(void);
 
-void OneWireWriteBit(Bit bitToWrite);
-Bit OneWireReadBit(void);
+void oneWireWriteBit(Bit bitToWrite);
+Bit oneWireReadBit(void);
 
-void OneWireWriteByte(u8 byteToWrite);
-u8 OneWireReadByte(void);
+void oneWireWriteByte(u8 byteToWrite);
+u8 oneWireReadByte(void);
 
 #endif /* end of include guard: __INC_ONEWIRE__ */

@@ -28,7 +28,7 @@ void waitForConversionDone(void)
   do
   {
     logk((KERN_INFO "Waiting for conversion... (attempt %3d/%3d)", attempts, maxAttempts));
-    statusConversion = OneWireReadBit();
+    statusConversion = oneWireReadBit();
     attempts++;
   }while(statusConversion != ONE && attempts < maxAttempts); //waiting for the temperature to be fully converted to the scratchpad
   if (attempts >= maxAttempts)
@@ -46,7 +46,7 @@ void readScratchpad(Scratchpad readedScratchpad)
   int i;
   for ( i = 0; i < 9; ++i )
   {
-    readedScratchpad[i] = OneWireReadByte();
+    readedScratchpad[i] = oneWireReadByte();
   }
   for ( i = 0; i < 9; ++i )
   {
@@ -63,7 +63,7 @@ void writeScratchpad(Scratchpad scratchpad)
   int i;
   for ( i = 2; i < 5; ++i )
   {
-    OneWireWriteByte(scratchpad[i]);
+    oneWireWriteByte(scratchpad[i]);
   }
   for ( i = 2; i < 5; ++i )
   {

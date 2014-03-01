@@ -13,7 +13,7 @@ void writeSensorID(SensorID sensorID)
   for ( i = 0; i < numberOfBytes; ++i )
   {
     byteToSend = getByte(sensorID, i);
-    OneWireWriteByte(byteToSend);
+    oneWireWriteByte(byteToSend);
   }
 }
 

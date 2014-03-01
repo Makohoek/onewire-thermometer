@@ -81,10 +81,10 @@ void sensorSetNewResolution(Sensor sensor)
 
 static void writeFunctionCommand(FunctionCommand functionCommand)
 {
-  OneWireWriteByte(functionCommand);
+  oneWireWriteByte(functionCommand);
 }
 
 static void writeROMCommand(ROMCommand romCommand)
 {
-  OneWireWriteByte(romCommand);
+  oneWireWriteByte(romCommand);
 }

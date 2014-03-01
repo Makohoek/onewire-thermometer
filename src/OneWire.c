@@ -1,8 +1,8 @@
 #include "OneWire.h"
 
 static unsigned long interruptFlags;
-static void OneWireWriteOneSlot(void);
-static void OneWireWriteZeroSlot(void);
+static void oneWireWriteOneSlot(void);
+static void oneWireWriteZeroSlot(void);
 static void disableInterruptions(void);
 static void enableInterruptions(void);
 
@@ -45,33 +45,33 @@ int sendInitializationSequence(void)
   return presencePulse;
 }
 
-void OneWireWriteByte(u8 byteToWrite)
+void oneWireWriteByte(u8 byteToWrite)
 {
   int i;
   for ( i = 0; i < 8; ++i )
   {
     Bit bitToWrite = intToBit((byteToWrite >> i) & 0x1);
-    OneWireWriteBit(bitToWrite);
+    oneWireWriteBit(bitToWrite);
     logk((KERN_INFO "send %d to 1w bus\n", BitToInt(bitToWrite)));
     udelay(2);
   }
 }
 
-u8 OneWireReadByte(void)
+u8 oneWireReadByte(void)
 {
   int i;
   Bit readedBit;
   u8 result = 0;
   for ( i = 0; i < 8; ++i )
   {
-    readedBit = OneWireReadBit();
+    readedBit = oneWireReadBit();
     result |= BitToInt(readedBit) << i;
     udelay(2);
   }
   return (result);
 }
 
-static void OneWireWriteOneSlot(void)
+static void oneWireWriteOneSlot(void)
 {
   disableInterruptions();
   pullBusLow();
@@ -81,7 +81,7 @@ static void OneWireWriteOneSlot(void)
   enableInterruptions();
 }
 
-static void OneWireWriteZeroSlot(void)
+static void oneWireWriteZeroSlot(void)
 {
   disableInterruptions();
   pullBusLow();
@@ -95,7 +95,7 @@ static void OneWireWriteZeroSlot(void)
  * Note: MUST be called after
  * a Read Command such as read scratchpad, for example
  */
-Bit OneWireReadBit(void)
+Bit oneWireReadBit(void)
 {
   Bit result;
   disableInterruptions();
@@ -109,15 +109,15 @@ Bit OneWireReadBit(void)
   return result;
 }
 
-void OneWireWriteBit(Bit bitToWrite)
+void oneWireWriteBit(Bit bitToWrite)
 {
   if ( bitToWrite == ONE )
   {
-    OneWireWriteOneSlot();
+    oneWireWriteOneSlot();
   }
   else
   {
-    OneWireWriteZeroSlot();
+    oneWireWriteZeroSlot();
   }
 }
 

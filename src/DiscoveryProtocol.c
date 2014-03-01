@@ -18,8 +18,8 @@ int performDiscovery(SensorID discoveredSensorID)
   for ( i = 0; i < 64; ++i )
   {
     responseBit = ZERO;
-    bit = OneWireReadBit();
-    complementaryBit = OneWireReadBit();
+    bit = oneWireReadBit();
+    complementaryBit = oneWireReadBit();
     if (isBitIdZERO(bit, complementaryBit))
     {
       responseBit = ZERO;
@@ -53,7 +53,7 @@ int performDiscovery(SensorID discoveredSensorID)
       }
     }
     // select which one can survive
-    OneWireWriteBit(responseBit);
+    oneWireWriteBit(responseBit);
     udelay(2);
     discoveredSensorID[i] = responseBit;
   }
